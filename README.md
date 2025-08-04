@@ -3,4 +3,9 @@ Repository for the Cloud Pipeline implemented at the Church Lane Solar Installat
 
 ## Starting
 
-Use `npx expo start` to start the development server.
+Use 
+```
+cd credit-frontend
+npx expo start
+```
+to start the development server.
