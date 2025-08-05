@@ -2,6 +2,7 @@
 Monorepo for the Cloud Pipeline implemented at the Church Lane Solar Installation
 
 ## Contents
+All code related to the CREDiT Project
 
 ### CREDiT-Frontend
 Frontend for visualisation and control
