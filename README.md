@@ -1,11 +1,14 @@
 # cloud-integration
-Repository for the Cloud Pipeline implemented at the Church Lane Solar Installation
+Monorepo for the Cloud Pipeline implemented at the Church Lane Solar Installation
 
-## Starting
+## Contents
 
-Use 
-```
-cd credit-frontend
-npx expo start
-```
-to start the development server.
+### CREDiT-Frontend
+Frontend for visualisation and control
+
+### Backend
+TBC - backend hosted on AWS Lightsail
+
+### Scripts
+TBC - scripts for collecting data and controlling devices on dataloggers/gateways/microcontrollers
+
