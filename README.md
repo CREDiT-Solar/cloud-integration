@@ -7,9 +7,9 @@ All code related to the CREDiT Project
 ### CREDiT-Frontend
 Frontend for visualisation and control
 
-### Backend
+### AWS Backend
 TBC - backend hosted on AWS Lightsail
 
-### Scripts
+### Local Scripts
 TBC - scripts for collecting data and controlling devices on dataloggers/gateways/microcontrollers
 
