@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-export default function HomeScreen() {
+export default function RegisterScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Home Page (Coming Soon)</Text>
+      <Text style={styles.text}>Register Page (Coming Soon)</Text>
     </View>
   );
 }
