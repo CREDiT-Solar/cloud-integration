@@ -3,7 +3,7 @@ import { SafeAreaView, View, Text, StyleSheet } from "react-native";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
-export default function HomeScreen() {
+export default function SettingsScreen() {
   return (
         <View style={styles.container}>
          <Header
@@ -13,11 +13,11 @@ export default function HomeScreen() {
     <SafeAreaView style={styles.container}>
       {/* Main */}
       <View style={styles.content}>
-       <Text style={styles.text}>Home Page (Coming Soon)</Text>
+       <Text style={styles.text}>Settings Page (Coming Soon)</Text>
      </View>
 
       {/* Footer */}
-      <Footer currentPage="Home" />
+      <Footer currentPage="Settings" />
     </SafeAreaView>
     </View>
   );
