@@ -17,7 +17,7 @@ export default function ControlScreen() {
      </View>
 
       {/* Footer */}
-      <Footer currentPage="Control Hub" />
+      <Footer currentPage="Control" />
     </SafeAreaView>
     </View>
   );
