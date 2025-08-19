@@ -42,3 +42,24 @@ Description: Returns the total solar energy produced for a specified timeframe.
 Arguments: JSON body with:
 `period`: string, one of `hour`, `day`, `24-hour`, `week`, `month`, `year`. Defaults to day
 Return Value: JSON array with the total energy produced in watts
+
+`/get_temperature`
+-
+Method: GET
+Description: Returns the most recent CS240DM temperature from the ground datalogger.
+Arguments: None
+Return Value: JSON object with the latest temperature in degrees Celsius (°C).
+
+`/get_humidity`
+-
+Method: GET
+Description: Returns the most recent relative humidity (RH) from the ground datalogger.
+Arguments: None
+Return Value: JSON object with the latest humidity in percent (%).
+
+`/get_irradiance`
+-
+Method: GET
+Description: Returns the most recent solar irradiance readings from the ground datalogger. Provides averages for SR30 and SR05 pyranometer channels.
+Arguments: None
+Return Value: JSON object with irradiance values in watts per square meter (W/m²).

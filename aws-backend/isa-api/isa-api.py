@@ -258,7 +258,53 @@ def solar_energy_totals():
         return jsonify(results)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+@app.route("/get_weather_temperature", methods=["GET"])
+def get_weather_temperature():
+    try:
+        ssh_tunnel.ensure_tunnel()
+        sql = """
+        SELECT CS240DM_Temperature AS latest_temperature
+        FROM ground_datalogger
+        ORDER BY timestamp DESC
+        LIMIT 1;
+        """
+        results = db.query(sql)
+        return jsonify(results)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
+@app.route("/get_humidity", methods=["GET"])
+def get_humidity():
+    try:
+        ssh_tunnel.ensure_tunnel()
+        sql = """
+            SELECT RH AS humidity
+            FROM ground_datalogger
+            ORDER BY timestamp DESC
+            LIMIT 1;
+        """
+        results = db.query(sql)
+        return jsonify(results)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+@app.route("/get_irradiance", methods=["GET"])
+def get_irradiance():
+    try:
+        ssh_tunnel.ensure_tunnel()
+        sql = """
+        SELECT
+            (SR30_Irr + SR30_Irr_2) / 2 AS total_irr,
+            (SR05_Irr + SR05_Irr_2 + SR05_Irr_3) / 3 AS diffuse_irr
+        FROM ground_datalogger
+        ORDER BY timestamp DESC
+        LIMIT 1;
+        """
+        results = db.query(sql)
+        return jsonify(results)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route("/health")
 def health():
