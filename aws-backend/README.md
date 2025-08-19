@@ -6,4 +6,4 @@ API Access to the ISA Server. Requires to be connected to University network, ei
 
 #### Schema
 
-`current_solar_prod`: returns the current power produced by the solar array, calculated through the summation of totalActivePower from each inverter
+`/current_solar_prod`: returns the current power produced by the solar array, calculated through the summation of totalActivePower from each inverter. Takes no arguments, GET request
