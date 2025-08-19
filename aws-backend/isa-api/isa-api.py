@@ -49,6 +49,27 @@ def run_query():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route("/current_solar_prod", methods=["GET"])
+def run_current_solar_prod():
+    try:
+        ssh_tunnel.ensure_tunnel()
+        sql = """WITH latest AS (
+                    SELECT
+                    inverter,
+                    totalActivePower,
+                    timestamp,
+                    ROW_NUMBER() OVER (PARTITION BY inverter ORDER BY timestamp DESC) AS rn
+                    FROM inverter_data
+                )
+                SELECT
+                    SUM(totalActivePower) / 1000.0 AS site_kW  -- drop "/ 1000.0" if your field is already kW
+                FROM latest
+                WHERE rn = 1;
+                """
+        results = db.query(sql)
+        return jsonify(results)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route("/health")
 def health():
