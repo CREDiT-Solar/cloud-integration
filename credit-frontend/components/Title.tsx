@@ -1,19 +1,42 @@
 import React from "react";
+import { View, Text, StyleSheet } from "react-native";
 
 export interface TitleProps {
     title: string;
     subtitle?: string;
 }
 
-const Title: React.FC<TitleProps> = ({ title, subtitle }) => {
-    return (
-        <div>
-            <div>
-                <h3>{title}</h3>
-            </div>
-            {subtitle && <div>{subtitle}</div>}
-        </div>
-    );
-};
+const Title: React.FC<TitleProps> = ({ title, subtitle }) => (
+  <View style={styles.root}>
+    <Text style={styles.title}>{title}</Text>
+    {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+  </View>
+);
+
+const styles = StyleSheet.create({
+  root: { 
+    marginBottom: 8 
+    },
+  title: { 
+    fontSize: 18, 
+    fontWeight: "bold" 
+    },
+  subtitle: { 
+    fontSize: 14, 
+    color: "#6b7280" 
+    },
+});
+
+
+// const Title: React.FC<TitleProps> = ({ title, subtitle }) => {
+//     return (
+//         <div>
+//             <div>
+//                 <h3>{title}</h3>
+//             </div>
+//             {subtitle && <div>{subtitle}</div>}
+//         </div>
+//     );
+// };
 
 export default Title;
