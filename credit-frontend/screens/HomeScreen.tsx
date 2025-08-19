@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, ScrollView, StyleSheet } from 'react-native';
 import Title from '../components/Title';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 import CardReadout from '../components/CardReadout';
 import PieChartComponent, { PieDataItem } from '../components/PieChart';
 import LineChartComponent, { LineChartData } from '../components/LineChart';
@@ -34,6 +36,10 @@ const lineChartData: LineChartData = {
 export default function HomeScreen() {
   return (
     <ScrollView style={styles.container}>
+        {/* Header */}
+        <View style={styles.container}>
+         <Header userName="Guest"
+       />
       <Title title="System Overview" subtitle="Monitor your solar energy performance" />
 
       <View style={styles.row}>
@@ -55,6 +61,11 @@ export default function HomeScreen() {
           </CardChart>
         </View>
       </View>
+
+      {/* Footer */}
+      <Footer currentPage="Home" />
+      </View>
+
     </ScrollView>
   );
 }
@@ -63,7 +74,7 @@ const styles = StyleSheet.create({
   container: { 
     flex: 1, 
     backgroundColor: "#fff", 
-    padding: 16 
+    padding: 5, 
   },
   row: {
     flexDirection: "row",
@@ -81,5 +92,4 @@ const styles = StyleSheet.create({
     alignItems: "center", 
   },
 });
-
 

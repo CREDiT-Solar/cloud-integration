@@ -61,7 +61,7 @@ export default function LandingScreen() {
         </Text>
 
         <Text style={styles.infoText}>
-          Monitor your solar energy system with real-time data and insights. Real-time solar production monitoring. Performance alerts and notifications.
+          Project information will be added - Monitor your solar energy system with real-time data and insights. Real-time solar production monitoring. Performance alerts and notifications.
           Monitor your solar energy system with real-time data and insights. Real-time solar production monitoring. Performance alerts and notifications. 
           Monitor your solar energy system with real-time data and insights. Real-time solar production monitoring. Performance alerts and notifications. 
           Monitor your solar energy system with real-time data and insights. Real-time solar production monitoring. Performance alerts and notifications.
