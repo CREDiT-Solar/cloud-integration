@@ -1,23 +1,85 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, ScrollView, StyleSheet } from 'react-native';
+import Title from '../components/Title';
+import CardReadout from '../components/CardReadout';
+import PieChartComponent, { PieDataItem } from '../components/PieChart';
+import LineChartComponent, { LineChartData } from '../components/LineChart';
+import CardChart from '../components/CardChart';
+import { Zap, Battery, Home, Plug } from 'lucide-react-native';
+
+const pieData: PieDataItem[] = [
+  { name: "Solar", population: 35, color: "#22c55e", legendFontColor: "#111", legendFontSize: 12 },
+  { name: "Battery", population: 25, color: "#3b82f6", legendFontColor: "#111", legendFontSize: 12 },
+  { name: "Usage", population: 15, color: "#f59e42", legendFontColor: "#111", legendFontSize: 12 },
+  { name: "Grid", population: 25, color: "#6b7280", legendFontColor: "#111", legendFontSize: 12 }
+];
+
+const lineChartData: LineChartData = {
+  labels: ["6:00", "9:00", "12:00", "15:00", "18:00", "21:00"],
+  datasets: [
+    {
+      data: [0, 2, 4, 4, 2, 0],
+      strokeWidth: 2,
+      color: (opacity = 1) => `rgba(34, 197, 94, ${opacity})`, 
+    },
+    {
+      data: [1, 2, 3, 2, 2, 2],
+      strokeWidth: 2,
+      color: (opacity = 1) => `rgba(55, 65, 81, ${opacity})`, 
+    },
+  ],
+  legend: ["Production", "Usage"]
+};
 
 export default function HomeScreen() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Home Page (Coming Soon)</Text>
-    </View>
+    <ScrollView style={styles.container}>
+      <Title title="System Overview" subtitle="Monitor your solar energy performance" />
+
+      <View style={styles.row}>
+        <CardReadout title="Solar Production" value="3.06" units="kW" subtitle="Current" icon={<Zap size={38} color="#22c55e" />} />
+        <CardReadout title="Battery SOC" value="85" units="%" subtitle="Charging" icon={<Battery size={38} color="#3b82f6" />} />
+        <CardReadout title="Energy Usage" value="1.68" units="kW" subtitle="Current Load" icon={<Home size={38} color="#111" />} />
+        <CardReadout title="Grid Status" value="0" units="kW" subtitle="Offline" icon={<Plug size={38} color="#f59e42" />} />
+      </View>
+
+      <View style={styles.graphRow}>
+        <View style={styles.graphBlock}>
+          <CardChart title="Today's Energy Flow">
+            <PieChartComponent data={pieData} width={240} height={180} />
+          </CardChart>
+        </View>
+        <View style={styles.graphBlock}>
+          <CardChart title="Production vs Usage">
+            <LineChartComponent data={lineChartData} width={240} height={180} />
+          </CardChart>
+        </View>
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
+  container: { 
+    flex: 1, 
+    backgroundColor: "#fff", 
+    padding: 16 
   },
-  text: {
-    fontSize: 20,
-    fontWeight: 'bold',
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 18,
+    marginHorizontal: 0,
+  },
+  graphRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 16,
+  },
+  graphBlock: { 
+    flex: 1, 
+    alignItems: "center", 
   },
 });
+
+
