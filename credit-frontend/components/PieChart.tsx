@@ -18,8 +18,8 @@ export interface PieChartComponentProps {
 
 export default function PieChartComponent({
   data,
-  width = 260,
-  height = 220,
+  width = 360,
+  height = 320,
 }: PieChartComponentProps) {
   return (
     <View>

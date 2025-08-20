@@ -20,8 +20,8 @@ export interface LineChartComponentProps {
 
 export default function LineChartComponent({
   data,
-  width = 260,
-  height = 220,
+  width = 460,
+  height = 320,
 }: LineChartComponentProps) {
   return (
     <View>

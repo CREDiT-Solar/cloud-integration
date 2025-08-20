@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, ScrollView, StyleSheet } from 'react-native';
+import { SafeAreaView, View, StyleSheet, ScrollView } from 'react-native';
 import Title from '../components/Title';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -35,61 +35,85 @@ const lineChartData: LineChartData = {
 
 export default function HomeScreen() {
   return (
-    <ScrollView style={styles.container}>
-        {/* Header */}
-        <View style={styles.container}>
-         <Header userName="Guest"
-       />
-      <Title title="System Overview" subtitle="Monitor your solar energy performance" />
-
-      <View style={styles.row}>
-        <CardReadout title="Solar Production" value="3.06" units="kW" subtitle="Current" icon={<Zap size={38} color="#22c55e" />} />
-        <CardReadout title="Battery SOC" value="85" units="%" subtitle="Charging" icon={<Battery size={38} color="#3b82f6" />} />
-        <CardReadout title="Energy Usage" value="1.68" units="kW" subtitle="Current Load" icon={<Home size={38} color="#111" />} />
-        <CardReadout title="Grid Status" value="0" units="kW" subtitle="Offline" icon={<Plug size={38} color="#f59e42" />} />
+    <SafeAreaView style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <Header userName="Guest" />
       </View>
 
-      <View style={styles.graphRow}>
-        <View style={styles.graphBlock}>
-          <CardChart title="Today's Energy Flow">
-            <PieChartComponent data={pieData} width={240} height={180} />
-          </CardChart>
+      {/* Main ScrollView */}
+      <ScrollView
+        style={styles.scrollContent}
+        contentContainerStyle={{ paddingBottom: 80 }}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.content}>
+          <Title title="System Overview" subtitle="Monitor your solar energy performance" />
+
+          <View style={styles.row}>
+            <CardReadout title="Solar Production" value="3.06" units="kW" subtitle="Current" icon={<Zap size={38} color="#22c55e" />} />
+            <CardReadout title="Battery SOC" value="85" units="%" subtitle="Charging" icon={<Battery size={38} color="#3b82f6" />} />
+            <CardReadout title="Energy Usage" value="1.68" units="kW" subtitle="Current Load" icon={<Home size={38} color="#111" />} />
+            <CardReadout title="Grid Status" value="0" units="kW" subtitle="Offline" icon={<Plug size={38} color="#f59e42" />} />
+          </View>
+
+          <View style={styles.graphRow}>
+            <View style={styles.graphBlock}>
+              <CardChart title="Today's Energy Flow">
+                <PieChartComponent data={pieData} width={340} height={280} />
+              </CardChart>
+            </View>
+            <View style={styles.graphBlock}>
+              <CardChart title="Production vs Usage">
+                <LineChartComponent data={lineChartData} width={440} height={280} />
+              </CardChart>
+            </View>
+          </View>
         </View>
-        <View style={styles.graphBlock}>
-          <CardChart title="Production vs Usage">
-            <LineChartComponent data={lineChartData} width={240} height={180} />
-          </CardChart>
-        </View>
-      </View>
+      </ScrollView>
 
       {/* Footer */}
-      <Footer currentPage="Home" />
+      <View style={styles.footer}>
+        <Footer currentPage="Home" />
       </View>
-
-    </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    backgroundColor: "#fff", 
-    padding: 5, 
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  header: {
+    // style for header
+  },
+  scrollContent: {
+    flex: 1,
+  },
+  content: {
+    flex: 1,
+    width: "100%",
+    justifyContent: "flex-start",
+    paddingHorizontal: 16,
   },
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 18,
-    marginHorizontal: 0,
   },
   graphRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     gap: 16,
   },
-  graphBlock: { 
-    flex: 1, 
-    alignItems: "center", 
+  graphBlock: {
+    flex: 1,
+  },
+  footer: {
+    // style for footer
   },
 });
+
+
 
