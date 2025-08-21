@@ -190,7 +190,7 @@ Return Value: JSON array of [timestamp, kWh] values.
 -
 Method: POST
 
-Description: Returns historical solar energy production as a timeseries for a specified period.
+Description: Returns historical solar energy consumption as a timeseries for a specified period.
 
 Arguments: JSON body with period: string, one of `hour`, `day`, `24-hour`, `week`, `month`, `year`. Defaults to day
 
@@ -200,7 +200,7 @@ Return Value: JSON array of [timestamp, kWh] values.
 -
 Method: POST
 
-Description: Returns the total solar energy produced over a specified period.
+Description: Returns the total solar energy consumed over a specified period.
 
 Arguments: JSON body with period: string, one of `hour`, `day`, `24-hour`, `week`, `month`, `year`. Defaults to day
 
