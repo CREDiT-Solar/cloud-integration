@@ -12,16 +12,12 @@ type StatusCardProps = {
   title: string;
   icon?: React.ReactNode;    
   fields: InfoField[];       
-  footerLabel?: string;       
-  footerHighlight?: boolean;  
 };
 
 const StatusCard: React.FC<StatusCardProps> = ({
   title,
   icon,
   fields,
-  footerLabel,
-  footerHighlight = false,
 }) => {
   return (
     <View style={styles.card}>
@@ -46,13 +42,6 @@ const StatusCard: React.FC<StatusCardProps> = ({
         ))}
       </View>
 
-      {footerLabel ? (
-        <View style={styles.footer}>
-          <Text style={[styles.footerText, footerHighlight && styles.highlightValue]}>
-            {footerLabel}
-          </Text>
-        </View>
-      ) : null}
     </View>
   );
 };
@@ -62,7 +51,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     borderRadius: 12,
-    padding: 16,
+    padding: 7,
     margin: 8,
     shadowColor: "#000",
     shadowOpacity: 0.1,
@@ -103,16 +92,6 @@ const styles = StyleSheet.create({
   },
   highlightValue: {
     color: "#22c55e", 
-  },
-  footer: {
-    borderTopColor: "#eee",
-    borderTopWidth: 1,
-    paddingTop: 8,
-  },
-  footerText: {
-    fontSize: 13,
-    color: "#777",
-    fontWeight: "600",
   },
 });
 

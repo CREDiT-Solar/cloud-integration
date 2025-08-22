@@ -27,16 +27,23 @@ const lineChartData: LineChartData = {
   legend: ["Solar Production Forecast", "Energy Usage Prediction"]
 };
 
-const efficiencyData: BarChartData = {
+// const efficiencyData: BarChartData = {
+//   labels: ["PV Panel", "Inverter", "Battery", "Overall"],
+//   legend: ["Efficiency (%)"],
+//   data: [
+//     [95],   // PV Panel
+//     [100],  // Inverter
+//     [92],   // Battery
+//     [88],   // Overall
+//   ],
+//   barColors: ["#22c55e"], 
+// };
+const efficiencyData = {
   labels: ["PV Panel", "Inverter", "Battery", "Overall"],
   legend: ["Efficiency (%)"],
-  data: [
-    [95],   // PV Panel
-    [100],  // Inverter
-    [92],   // Battery
-    [88],   // Overall
+  datasets: [
+    { data: [95, 100, 92, 88], color: "#22c55e" },
   ],
-  barColors: ["#22c55e"], 
 };
 
 
