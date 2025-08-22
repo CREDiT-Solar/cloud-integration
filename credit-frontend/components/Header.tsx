@@ -38,7 +38,7 @@ export default function Header({
           )}
         </TouchableOpacity>
         <Bell color={isDark ? "#fff" : "#111"} size={22} style={{ marginLeft: 13 }} />
-        <Text style={styles.sIcon}>S</Text>
+        <Text style={styles.sIcon}>G</Text>
         <Text style={[styles.userName, isDark && styles.darkText]}>{userName}</Text>
       </View>
     </View>

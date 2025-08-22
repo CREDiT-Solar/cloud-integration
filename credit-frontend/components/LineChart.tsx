@@ -1,6 +1,13 @@
 import React from "react";
-import { View } from "react-native";
-import { LineChart } from "react-native-chart-kit";
+import { Dimensions, View } from "react-native";
+import {
+  VictoryChart,
+  VictoryLine,
+  VictoryTheme,
+  VictoryAxis,
+  VictoryScatter,
+  VictoryLegend,
+} from "victory";
 
 export interface LineChartData {
   labels: string[];
@@ -20,38 +27,81 @@ export interface LineChartComponentProps {
 
 export default function LineChartComponent({
   data,
-  width = 260,
-  height = 220,
+  width,
+  height,
 }: LineChartComponentProps) {
+  const screenWidth = Dimensions.get("window").width;
+
+  const transformedDatasets = data.datasets.map((dataset, idx) =>
+    dataset.data.map((y, i) => ({
+      x: data.labels[i],
+      y,
+      color: dataset.color ? dataset.color(1) : "black",
+      strokeWidth: dataset.strokeWidth || 2,
+    }))
+  );
+
   return (
     <View>
-      <LineChart
-        data={data}
-        width={width}
-        height={height}
-        chartConfig={{
-            backgroundColor: "#ffffff",
-            backgroundGradientFrom: "#ffffff",
-            backgroundGradientTo: "#ffffff",
-            decimalPlaces: 1,
-            color: (opacity = 1) => `rgba(34, 197, 94, ${opacity})`,
-            labelColor: (opacity = 1) => `rgba(55, 65, 81, ${opacity})`,
-            propsForDots: { r: "4" },
-            strokeWidth: 2,
-            style: {
-                borderRadius: 8,
-                backgroundColor: "#ffffff", 
-            },
+      <VictoryChart
+        theme={VictoryTheme.material}
+        domainPadding={{ x: 25, y: 20 }}
+        width={width || screenWidth - 20}
+        height={height || 320}
+      >
+ 
+        <VictoryAxis
+          dependentAxis
+          style={{
+            axis: { stroke: "#ccc" },
+            tickLabels: { fontSize: 12, fill: "#374151" },
+          }}
+        />
+  
+        <VictoryAxis
+          style={{
+            axis: { stroke: "#ccc" },
+            tickLabels: { fontSize: 12, fill: "#374151" },
+          }}
+        />
+   
+        {transformedDatasets.map((dataset, idx) => [
+          <VictoryLine
+            key={`line-${idx}`}
+            data={dataset}
+            interpolation="natural"
+            style={{
+              data: {
+                stroke: dataset[0].color,
+                strokeWidth: dataset[0].strokeWidth,
+              },
             }}
-        bezier
-        withShadow={false}
-        style={{
-            borderRadius: 8,
-            backgroundColor: "#ffffff",
-            marginTop: 8, 
+          />,
+          <VictoryScatter
+            key={`scatter-${idx}`}
+            data={dataset}
+            size={4}
+            style={{
+              data: { fill: dataset[0].color },
             }}
-        verticalLabelRotation={0}
-      />
+          />,
+        ])}
+
+        {data.legend && (
+          <VictoryLegend
+            x={50}
+            y={10}
+            orientation="horizontal"
+            gutter={20}
+            style={{ labels: { fontSize: 12 } }}
+            data={data.legend.map((label, idx) => ({
+              name: label,
+              symbol: { fill: transformedDatasets[idx][0].color },
+            }))}
+          />
+        )}
+      </VictoryChart>
     </View>
   );
 }
+

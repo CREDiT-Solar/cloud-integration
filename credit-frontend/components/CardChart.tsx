@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 3,
     width: "100%",
-    minHeight: 300, 
+    minHeight: 400, 
     justifyContent: "flex-start",
   },
   title: {

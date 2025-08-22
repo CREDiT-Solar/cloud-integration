@@ -1,6 +1,6 @@
 import React from "react";
-import { View } from "react-native";
-import { PieChart } from "react-native-chart-kit";
+import { Dimensions, View } from "react-native";
+import { VictoryPie } from "victory";
 
 export interface PieDataItem {
   name: string;
@@ -18,22 +18,35 @@ export interface PieChartComponentProps {
 
 export default function PieChartComponent({
   data,
-  width = 260,
-  height = 220,
+  width,
+  height,
 }: PieChartComponentProps) {
+  const screenWidth = Dimensions.get("window").width;
+
+  const chartData = data.map((item) => ({
+    x: item.name,
+    y: item.population,
+    fill: item.color,
+  }));
+
   return (
     <View>
-      <PieChart
-        data={data}
-        width={width}
-        height={height}
-        chartConfig={{ color: () => "#000", backgroundColor: "#fff" }}
-        accessor="population"
-        backgroundColor="transparent"
-        paddingLeft="30"
-        center={[0, 0]}
-        hasLegend={false}
-        absolute
+      <VictoryPie
+        data={chartData}
+        width={width || screenWidth - 20}
+        height={height || 320}
+        colorScale={chartData.map((d) => d.fill)} 
+        labels={({ datum }: { datum: { x: string; y: number } }) =>
+          `${datum.x}\n${datum.y}`
+        }
+        style={{
+          labels: {
+            fill: "#000",
+            fontSize: 12,
+          },
+        }}
+        innerRadius={50}  
+        padAngle={2}      
       />
     </View>
   );
