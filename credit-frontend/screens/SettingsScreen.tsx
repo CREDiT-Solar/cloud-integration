@@ -220,11 +220,8 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   picker: {
-    // alignItems: "center",
-    justifyContent:"center",
     height: 40,
     width: 100,
-
   },
   footer: {
     // style for footer

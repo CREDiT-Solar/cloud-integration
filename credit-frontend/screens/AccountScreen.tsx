@@ -1,8 +1,9 @@
 import React from "react";
-import { SafeAreaView, View, StyleSheet, ScrollView } from "react-native";
+import { SafeAreaView, View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import Title from "../components/Title";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { ChevronRight } from "lucide-react-native";
 
 export default function AccountScreen() {
   return (
@@ -18,8 +19,51 @@ export default function AccountScreen() {
         contentContainerStyle={{ paddingBottom: 80 }}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.content}>
-          <Title title="User Page" subtitle="Manage your account" />
+        <Text style={styles.pageTitle}>User Page</Text>
+
+        {/* Manage Account Section */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Manage your account</Text>
+
+
+          <AccountRow
+            label="Change Password"
+            description="Change your password here"
+            onPress={() => console.log("Change Password")}
+          />
+          <AccountRow
+            label="Change Username"
+            description="Change your username here"
+            onPress={() => console.log("Change Username")}
+          />
+          <AccountRow
+            label="System Update"
+            description="Available to update"
+            onPress={() => console.log("System Update")}
+          />
+          <AccountRow
+            label="Deactivate Account"
+            description="If you deactivate your account, all your settings will be lost."
+            onPress={() => console.log("Deactivate Account")}
+          />
+        </View>
+
+        {/* Finance Section */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Finance</Text>
+
+          <FinanceRow
+            label="Electricity Access Time"
+            description="Electricity availability hours this month"
+          />
+          <FinanceRow
+            label="Energy Saving"
+            description="Energy cost savings this month"
+          />
+          <FinanceRow
+            label="Estimated Lifetime Savings"
+            description="Estimated total cost savings over 10 years"
+          />
         </View>
       </ScrollView>
 
@@ -31,6 +75,30 @@ export default function AccountScreen() {
   );
 }
 
+type RowProps = {
+  label: string;
+  description?: string;
+  onPress?: () => void;
+};
+
+const AccountRow = ({ label, description, onPress }: RowProps) => (
+  <TouchableOpacity style={styles.row} onPress={onPress}>
+    <View style={{ flex: 1 }}>
+      <Text style={styles.rowLabel}>{label}</Text>
+      {description && <Text style={styles.rowDescription}>{description}</Text>}
+    </View>
+    <ChevronRight size={20} color="#22c55e" />
+  </TouchableOpacity>
+);
+
+const FinanceRow = ({ label, description }: RowProps) => (
+  <View style={styles.row}>
+    <View style={{ flex: 1 }}>
+      <Text style={styles.rowLabel}>{label}</Text>
+      {description && <Text style={styles.rowDescription}>{description}</Text>}
+    </View>
+  </View>
+);
 
 const styles = StyleSheet.create({
   container: {
@@ -42,25 +110,41 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flex: 1,
-  },
-  content: {
-    flex: 1,
-    width: "100%",
-    justifyContent: "flex-start",
     paddingHorizontal: 16,
+  },
+  pageTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginVertical: 12,
+  },
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+  },
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginBottom: 12,
   },
   row: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 18,
+    alignItems: "center",
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
   },
-  graphRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 16,
+  rowLabel: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#111",
   },
-  graphBlock: {
-    flex: 1,
+  rowDescription: {
+    fontSize: 12,
+    color: "#6b7280",
   },
   footer: {
     // style for footer
