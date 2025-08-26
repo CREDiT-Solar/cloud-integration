@@ -48,6 +48,7 @@ export default function SettingsScreen() {
                 selectedValue={theme}
                 onValueChange={(value) => setTheme(value)}
                 style={styles.picker}
+                itemStyle={{ textAlign: "center" }}
               >
                 <Picker.Item label="Light" value="Light" />
                 <Picker.Item label="Dark" value="Dark" />
@@ -187,7 +188,7 @@ const styles = StyleSheet.create({
   },
   section: {
     backgroundColor: "#fafafa",
-    padding: 18,
+    padding: 5,
     borderRadius: 12,
     marginBottom: 20,
     borderWidth: 1,
@@ -222,6 +223,8 @@ const styles = StyleSheet.create({
   picker: {
     height: 40,
     width: 100,
+    justifyContent: "center",
+    textAlign: "center", 
   },
   footer: {
     // style for footer
