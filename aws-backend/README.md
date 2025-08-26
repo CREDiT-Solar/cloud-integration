@@ -84,7 +84,7 @@ Description: Returns the most recent solar irradiance readings from the ground d
 
 Arguments: None
 
-Return Value: JSON object with irradiance values in watts per square meter (W/m²).
+Return Value: JSON object with irradiance values in watts per square meter (W/m²). 0 is SR30 value, 1 is SR05 value
 
 `/get_battery_voltage`
 -
