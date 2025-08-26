@@ -3,7 +3,8 @@ import atexit
 from ssh_tunnel import SSHTunnelManager
 from database import Database
 import datetime
-from datetime import timedelta
+from datetime import datetime, timedelta
+import random
 
 # ====== Config ======
 SSH_CONFIG = {
@@ -34,51 +35,84 @@ app = Flask(__name__)
 # Battery constants
 BATTERY_MIN_VOLTAGE = 5.0
 BATTERY_MAX_VOLTAGE = 18.0
-CURRENT_THRESHOLD   = 0.5
+CURRENT_THRESHOLD = 0.5
 # Load constants
 BASELINE_KW = 2.0
 DAYLIGHT_FACTOR = 1.0
-COOLING_ALPHA = 0.25   # kW/°C
-HEATING_ALPHA = 0.20   # kW/°C
+COOLING_ALPHA = 0.25  # kW/°C
+HEATING_ALPHA = 0.20  # kW/°C
 COOLING_THRESHOLD = 22.0
 HEATING_THRESHOLD = 18.0
 
+
+def run_db_query(sql, params=None):
+    """Ensure tunnel, run SQL, return JSON-safe results."""
+    try:
+        ssh_tunnel.ensure_tunnel()
+        results = db.query(sql, params or [])
+        return jsonify(results)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+def run_safe(func):
+    """Decorator to wrap route functions in error handling."""
+
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+
+    wrapper.__name__ = func.__name__
+    return wrapper
+
+
+def get_period_range(period: str, now=None):
+    """
+    Returns a tuple (start_time, interval_seconds, group_by)
+    based on a standard period string.
+    """
+    now = now or datetime.utcnow()
+
+    period_map = {
+        "hour":      (now - timedelta(hours=1), 5*60, "5min"),      # 5-minute intervals
+        "day":       (now.replace(hour=0, minute=0, second=0, microsecond=0), 3600, "hour"),  # hourly
+        "24-hour":   (now - timedelta(hours=24), 3600, "hour"),     # hourly
+        "week":      (now - timedelta(days=7), 6*3600, "6hour"),    # 6-hour intervals
+        "month":     (now - timedelta(days=30), 24*3600, "day"),    # daily
+        "year":      (now - timedelta(weeks=52), 7*24*3600, "week") # weekly
+    }
+
+    result = period_map.get(period.lower())
+    if not result:
+        raise ValueError(f"Invalid period: {period}")
+    return result  # (start_time, interval_seconds, group_by)
+
+
 @app.route("/query", methods=["POST"])
+@run_safe
 def run_query():
     data = request.json
     sql = data.get("query")
     params = data.get("params", [])
-
     if not sql:
         return jsonify({"error": "No SQL query provided"}), 400
-
-    try:
-        ssh_tunnel.ensure_tunnel()
-        results = db.query(sql, params)
-        return jsonify(results)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    return run_db_query(sql, params)
 
 
 @app.route("/current_solar_prod", methods=["GET"])
 def run_current_solar_prod():
-    try:
-        ssh_tunnel.ensure_tunnel()
-        sql = """SELECT 
-    SUM(avg_power) / 1000.0 AS site_kW_5min_avg
-FROM (
-    SELECT 
-        inverter,
-        AVG(totalActivePower) AS avg_power
-    FROM inverter_data
-    WHERE timestamp >= NOW() - INTERVAL 5 MINUTE
-    GROUP BY inverter
-) t;
-                """
-        results = db.query(sql)
-        return jsonify(results)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    sql = """
+    SELECT SUM(avg_power)/1000.0 AS site_kW_5min_avg
+    FROM (
+        SELECT inverter, AVG(totalActivePower) AS avg_power
+        FROM inverter_data
+        WHERE timestamp >= NOW() - INTERVAL 5 MINUTE
+        GROUP BY inverter
+    ) t;
+    """
+    return run_db_query(sql)
 
 
 @app.route("/historical_solar_prod", methods=["POST"])
@@ -217,34 +251,23 @@ def run_historical_solar_prod():
 
 @app.route("/get_voltage", methods=["GET"])
 def get_voltage():
-    try:
-        ssh_tunnel.ensure_tunnel()
-        sql = """
-        SELECT 
-            AVG((L1acVoltage + L2acVoltage + L3acVoltage)/3) AS avg_voltage
-        FROM inverter_data
-        WHERE timestamp >= NOW() - INTERVAL 5 MINUTE;
-        """
-        results = db.query(sql)
-        return jsonify(results)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    sql = """
+    SELECT AVG((L1acVoltage+L2acVoltage+L3acVoltage)/3) AS avg_voltage
+    FROM inverter_data
+    WHERE timestamp >= NOW() - INTERVAL 5 MINUTE;
+    """
+    return run_db_query(sql)
 
 
 @app.route("/get_current", methods=["GET"])
 def get_current():
-    try:
-        ssh_tunnel.ensure_tunnel()
-        sql = """
+    sql = """
         SELECT 
             AVG((L1acCurrent + L2acCurrent + L3acCurrent)/3) AS avg_current
         FROM inverter_data
         WHERE timestamp >= NOW() - INTERVAL 5 MINUTE;
         """
-        results = db.query(sql)
-        return jsonify(results)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    return run_db_query(sql)
 
 
 @app.route("/solar_energy_totals", methods=["POST"])
@@ -277,41 +300,29 @@ def solar_energy_totals():
 
 @app.route("/get_weather_temperature", methods=["GET"])
 def get_weather_temperature():
-    try:
-        ssh_tunnel.ensure_tunnel()
-        sql = """
+    sql = """
         SELECT CS240DM_Temperature AS latest_temperature
         FROM ground_datalogger
         ORDER BY timestamp DESC
         LIMIT 1;
         """
-        results = db.query(sql)
-        return jsonify(results)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    return run_db_query(sql)
 
 
 @app.route("/get_humidity", methods=["GET"])
 def get_humidity():
-    try:
-        ssh_tunnel.ensure_tunnel()
-        sql = """
+    sql = """
             SELECT RH AS humidity
             FROM ground_datalogger
             ORDER BY timestamp DESC
             LIMIT 1;
         """
-        results = db.query(sql)
-        return jsonify(results)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    return run_db_query(sql)
 
 
 @app.route("/get_irradiance", methods=["GET"])
 def get_irradiance():
-    try:
-        ssh_tunnel.ensure_tunnel()
-        sql = """
+    sql = """
         SELECT
             (SR30_Irr + SR30_Irr_2) / 2 AS total_irr,
             (SR05_Irr + SR05_Irr_2 + SR05_Irr_3) / 3 AS diffuse_irr
@@ -319,32 +330,24 @@ def get_irradiance():
         ORDER BY timestamp DESC
         LIMIT 1;
         """
-        results = db.query(sql)
-        return jsonify(results)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    return run_db_query(sql)
 
 
 @app.route("/get_battery_voltage", methods=["GET"])
 def get_battery_voltage():
-    try:
-        ssh_tunnel.ensure_tunnel()
-        sql = """
+    sql = """
         SELECT BattV
         FROM rooftop_datalogger
         ORDER BY timestamp DESC
         LIMIT 1;
         """
-        results = db.query(sql)
-        return jsonify(results)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    return run_db_query(sql)
+
 
 @app.route("/get_battery_current", methods=["GET"])
+@run_safe
 def get_battery_current():
-    try:
-        ssh_tunnel.ensure_tunnel()
-        sql = """
+    sql = """
         SELECT i.totalActivePower, g.BattV, g.timestamp
         FROM inverter_data i
         JOIN rooftop_datalogger g
@@ -352,54 +355,57 @@ def get_battery_current():
         ORDER BY g.timestamp DESC
         LIMIT 1;
         """
-        results = db.query(sql)
+    results = db.query(sql)
 
-        if not results or not results[0][0] or not results[0][1]:
-            return jsonify({"error": "No valid data found"}), 404
+    if not results or not results[0][0] or not results[0][1]:
+        return jsonify({"error": "No valid data found"}), 404
 
-        power_w = results[0][0]   # totalActivePower
-        batt_v = results[0][1]    # BattV
+    power_w = results[0][0]  # totalActivePower
+    batt_v = results[0][1]  # BattV
 
-        battery_current = power_w / batt_v if batt_v else None
+    battery_current = power_w / batt_v if batt_v else None
 
-        return jsonify({
+    return jsonify(
+        {
             round(battery_current, 2) if battery_current else None,
-        })
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-    
+        }
+    )
+
+
 @app.route("/get_battery_percentage", methods=["GET"])
+@run_safe
 def get_battery_percentage():
-    try:
-        ssh_tunnel.ensure_tunnel()
-        sql = """
+    sql = """
         SELECT BattV, timestamp
         FROM rooftop_datalogger
         ORDER BY timestamp DESC
         LIMIT 1;
         """
-        results = db.query(sql)
+    results = db.query(sql)
 
-        if not results:
-            return jsonify({"error": "No battery voltage data found"}), 404
+    if not results:
+        return jsonify({"error": "No battery voltage data found"}), 404
 
-        batt_v = results[0][0]
+    batt_v = results[0][0]
 
-        percentage = (batt_v - BATTERY_MIN_VOLTAGE) / (BATTERY_MAX_VOLTAGE - BATTERY_MIN_VOLTAGE) * 100
-        percentage = max(0, min(100, percentage))  # Clamp between 0 and 100
+    percentage = (
+        (batt_v - BATTERY_MIN_VOLTAGE)
+        / (BATTERY_MAX_VOLTAGE - BATTERY_MIN_VOLTAGE)
+        * 100
+    )
+    percentage = max(0, min(100, percentage))  # Clamp between 0 and 100
 
-        return jsonify({
+    return jsonify(
+        {
             round(percentage, 2),
-        })
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        }
+    )
 
 
 @app.route("/get_battery_state", methods=["GET"])
+@run_safe
 def get_battery_state():
-    try:
-        ssh_tunnel.ensure_tunnel()
-        sql = """
+    sql = """
         SELECT i.totalActivePower, r.BattV, r.timestamp
         FROM inverter_data i
         JOIN rooftop_datalogger r
@@ -407,28 +413,29 @@ def get_battery_state():
         ORDER BY r.timestamp DESC
         LIMIT 1;
         """
-        results = db.query(sql)
+    results = db.query(sql)
 
-        if not results:
-            return jsonify({"error": "No battery data found"}), 404
+    if not results:
+        return jsonify({"error": "No battery data found"}), 404
 
-        power_w = results[0][0]   # totalActivePower
-        batt_v = results[0][1]    # BattV
+    power_w = results[0][0]  # totalActivePower
+    batt_v = results[0][1]  # BattV
 
-        battery_current = power_w / batt_v if batt_v else 0
+    battery_current = power_w / batt_v if batt_v else 0
 
-        if battery_current > CURRENT_THRESHOLD:
-            state = "charging"
-        elif battery_current < -CURRENT_THRESHOLD:
-            state = "discharging"
-        else:
-            state = "idle"
+    if battery_current > CURRENT_THRESHOLD:
+        state = "charging"
+    elif battery_current < -CURRENT_THRESHOLD:
+        state = "discharging"
+    else:
+        state = "idle"
 
-        return jsonify({
+    return jsonify(
+        {
             state,
-        })
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        }
+    )
+
 
 @app.route("/battery_percentage_timeseries", methods=["POST"])
 def battery_percentage_timeseries():
@@ -436,7 +443,7 @@ def battery_percentage_timeseries():
         ssh_tunnel.ensure_tunnel()
         period = request.json.get("period", "day").lower()
 
-        now = datetime.datetime.now()
+        now = datetime.now()
         if period == "hour":
             start_time = now - timedelta(hours=1)
             group_by = "DATE_FORMAT(timestamp, '%Y-%m-%d %H:%i')"  # 5-min intervals
@@ -471,12 +478,16 @@ def battery_percentage_timeseries():
             ORDER BY time_group ASC;
         """
 
-        results = db.query(sql, (CURRENT_THRESHOLD, BATTERY_MAX_VOLTAGE, BATTERY_MIN_VOLTAGE, start_time))
+        results = db.query(
+            sql,
+            (CURRENT_THRESHOLD, BATTERY_MAX_VOLTAGE, BATTERY_MIN_VOLTAGE, start_time),
+        )
         return jsonify(results)
-    
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-    
+
+
 def compute_load(irr1, irr2, temp_c):
     # Compute synthetic load in kW from irradiance and temperature
     if irr1 is None and irr2 is None:
@@ -494,85 +505,78 @@ def compute_load(irr1, irr2, temp_c):
 
     return max(0, BASELINE_KW + L_day + L_cool + L_heat)
 
+
 @app.route("/current_load", methods=["GET"])
+@run_safe
 def get_current_load():
-    try:
-        ssh_tunnel.ensure_tunnel()
-        sql = """
+    sql = """
         SELECT SR30_Irr, SR30_Irr_2, PTemp_C
         FROM ground_datalogger
         ORDER BY timestamp DESC
         LIMIT 1;
         """
-        rows = db.query(sql)
-        if not rows:
-            return jsonify({"error": "No data"}), 404
+    rows = db.query(sql)
+    if not rows:
+        return jsonify({"error": "No data"}), 404
 
-        irr1, irr2, temp = rows[0]  # tuple indexing
-        load_kw = compute_load(irr1, irr2, temp)
-        return jsonify(load_kw)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    irr1, irr2, temp = rows[0]  # tuple indexing
+    load_kw = compute_load(irr1, irr2, temp)
+    return jsonify(load_kw)
 
 
 @app.route("/total_load_today", methods=["GET"])
+@run_safe
 def get_total_load_today():
-    try:
-        ssh_tunnel.ensure_tunnel()
-        midnight = datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-        sql = """
+    midnight = datetime.now().replace(
+        hour=0, minute=0, second=0, microsecond=0
+    )
+    sql = """
         SELECT timestamp, SR30_Irr, SR30_Irr_2, PTemp_C
         FROM rooftop_datalogger
         WHERE timestamp >= %s
         ORDER BY timestamp ASC;
         """
-        rows = db.query(sql, (midnight,))
-        if not rows:
-            return jsonify({"error": "No data"}), 404
+    rows = db.query(sql, (midnight,))
+    if not rows:
+        return jsonify({"error": "No data"}), 404
 
-        total_kwh = 0.0
-        for i in range(1, len(rows)):
-            t1, irr1a, irr2a, temp1 = rows[i-1]
-            t2, irr1b, irr2b, temp2 = rows[i]
+    total_kwh = 0.0
+    for i in range(1, len(rows)):
+        t1, irr1a, irr2a, temp1 = rows[i - 1]
+        t2, irr1b, irr2b, temp2 = rows[i]
 
-            load1 = compute_load(irr1a, irr2a, temp1)
-            load2 = compute_load(irr1b, irr2b, temp2)
+        load1 = compute_load(irr1a, irr2a, temp1)
+        load2 = compute_load(irr1b, irr2b, temp2)
 
-            delta_h = (t2 - t1).total_seconds() / 3600.0
-            total_kwh += 0.5 * (load1 + load2) * delta_h
+        delta_h = (t2 - t1).total_seconds() / 3600.0
+        total_kwh += 0.5 * (load1 + load2) * delta_h
 
-        return jsonify(total_kwh)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    return jsonify(total_kwh)
 
 
 @app.route("/peak_load_today", methods=["GET"])
+@run_safe
 def get_peak_load_today():
-    try:
-        ssh_tunnel.ensure_tunnel()
-        midnight = datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-        sql = """
+    midnight = datetime.now().replace(
+        hour=0, minute=0, second=0, microsecond=0
+    )
+    sql = """
         SELECT SR30_Irr, SR30_Irr_2, PTemp_C
         FROM rooftop_datalogger
         WHERE timestamp >= %s
         ORDER BY timestamp ASC;
         """
-        rows = db.query(sql, (midnight,))
-        if not rows:
-            return jsonify({"error": "No data"}), 404
+    rows = db.query(sql, (midnight,))
+    if not rows:
+        return jsonify({"error": "No data"}), 404
 
-        max_kw = 0.0
-        for irr1, irr2, temp in rows:
-            load_kw = compute_load(irr1, irr2, temp)
-            max_kw = max(max_kw, load_kw)
+    max_kw = 0.0
+    for irr1, irr2, temp in rows:
+        load_kw = compute_load(irr1, irr2, temp)
+        max_kw = max(max_kw, load_kw)
 
-        return jsonify(max_kw)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    return jsonify(max_kw)
 
-import random
-
-import random
 
 @app.route("/grid_self_consumption", methods=["POST"])
 def grid_self_consumption():
@@ -625,14 +629,15 @@ def grid_self_consumption():
         return jsonify(output)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-    
+
+
 @app.route("/grid_status", methods=["POST"])
 def grid_status():
     try:
         data = request.get_json() or {}
         period = data.get("period", "hour")
         ssh_tunnel.ensure_tunnel()
-        now = datetime.datetime.utcnow()
+        now = datetime.utcnow()
 
         if period == "hour":
             start_time = now - timedelta(hours=1)
@@ -678,13 +683,14 @@ def grid_status():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
 @app.route("/solar_energy_usage", methods=["POST"])
 def solar_energy_usage():
     try:
         data = request.get_json() or {}
         period = data.get("period", "hour")
         ssh_tunnel.ensure_tunnel()
-        now = datetime.datetime.utcnow()
+        now = datetime.utcnow()
 
         if period == "hour":
             start_time = now - timedelta(hours=1)
@@ -729,18 +735,19 @@ def solar_energy_usage():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
 @app.route("/solar_energy_total", methods=["POST"])
 def solar_energy_total():
     try:
         data = request.get_json() or {}
         period = data.get("period", "day")
         ssh_tunnel.ensure_tunnel()
-        now = datetime.datetime.utcnow()  # <- fixed here
+        now = datetime.utcnow()  # <- fixed here
 
         if period == "hour":
             start_time = now - datetime.timedelta(hours=1)
         elif period == "day":
-            start_time = datetime.datetime(now.year, now.month, now.day)
+            start_time = datetime(now.year, now.month, now.day)
         elif period == "24-hour":
             start_time = now - datetime.timedelta(hours=24)
         elif period == "week":
@@ -767,6 +774,7 @@ def solar_energy_total():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
 def health():
     ssh_tunnel.ensure_tunnel()
     return jsonify({"status": "ok"})
@@ -780,7 +788,3 @@ def shutdown():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
-
-
-# SOLAR ENERGY USAGE
-# solar energy summed from (hour, day, 24-hour, week, month, year)
