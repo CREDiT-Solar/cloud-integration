@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Dimensions } from "react-native";
 import {
@@ -6,15 +7,14 @@ import {
   VictoryTheme,
   VictoryAxis,
   VictoryLabel,
-  VictoryGroup,
   VictoryLegend,
+  VictoryGroup,
 } from "victory";
 
 export type BarChartData = {
-  labels: string[];
-  legend: string[];
-  data: number[][];        
-  barColors: string[];     
+  labels: string[]; 
+  legend?: string[]; 
+  datasets: { data: number[]; color?: string }[]; // for multiple dataset
 };
 
 type Props = {
@@ -26,67 +26,79 @@ type Props = {
 const BarchartComponent: React.FC<Props> = ({ data, width, height }) => {
   const screenWidth = Dimensions.get("window").width;
 
-  const datasets = data.legend.map((legend, datasetIdx) =>
-    data.labels.map((label, i) => ({
-      x: label,
-      y: data.data[i][datasetIdx],
-    }))
-  );
-
   return (
     <VictoryChart
       theme={VictoryTheme.material}
-      domainPadding={{ x: 40, y: 20 }}
+      domainPadding={{ x: 20, y: 20 }}
       width={width || screenWidth - 20}
-      height={height || 280}
+      height={height || 300}
     >
 
       <VictoryAxis
         dependentAxis
         style={{
-          tickLabels: { fontSize: 12, padding: 5 },
+          tickLabels: { fontSize: 10, padding: 3 },
           axis: { stroke: "#888" },
         }}
       />
 
       <VictoryAxis
+        tickFormat={(t) => `${t}`}
         style={{
-          tickLabels: { fontSize: 12, padding: 5 },
+          tickLabels: {
+            fontSize: 8,
+            angle: data.labels.length > 10 ? -45 : 0, 
+            padding: 5,
+          },
           axis: { stroke: "#888" },
         }}
       />
 
-      <VictoryGroup offset={40}>
-        {datasets.map((dataset, idx) => (
+      {data.legend && (
+        <VictoryLegend
+          x={50}
+          y={0}
+          orientation="horizontal"
+          gutter={20}
+          style={{ labels: { fontSize: 10 } }}
+          data={data.legend.map((l, i) => ({
+            name: l,
+            symbol: { fill: data.datasets[i]?.color || "#000" },
+          }))}
+        />
+      )}
+
+      {/* Grouped Bar */}
+      <VictoryGroup
+        offset={Math.max(12, (200 / data.labels.length))} // adjust data group interval
+      >
+        {data.datasets.map((set, setIndex) => (
           <VictoryBar
-            key={idx}
-            data={dataset}
-            labels={({ datum }) => `${datum.y}`}
+            key={setIndex}
+            data={data.labels.map((label, i) => ({
+              x: label,
+              y: set.data[i],
+            }))}
             style={{
-              data: { fill: data.barColors[idx] },
-              labels: { fill: "#000", fontSize: 12, padding: -10 },
+              data: {
+                fill: set.color || "#4285F4",
+                // Adjust bar width
+                width: Math.min(40, Math.max(8, 300 / data.labels.length)),
+              },
+              labels: { fontSize: 8 },
             }}
-            labelComponent={<VictoryLabel dy={-15} />}
+            labels={({ datum }) => `${datum.y}`}
+            labelComponent={<VictoryLabel dy={-10} />}
           />
         ))}
       </VictoryGroup>
-
-      <VictoryLegend
-        x={50}
-        y={10}
-        orientation="horizontal"
-        gutter={20}
-        style={{ labels: { fontSize: 12 } }}
-        data={data.legend.map((label, idx) => ({
-          name: label,
-          symbol: { fill: data.barColors[idx] },
-        }))}
-      />
     </VictoryChart>
   );
 };
 
 export default BarchartComponent;
+
+
 
 
 

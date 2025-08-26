@@ -61,7 +61,12 @@ export default function LineChartComponent({
         <VictoryAxis
           style={{
             axis: { stroke: "#ccc" },
-            tickLabels: { fontSize: 12, fill: "#374151" },
+            // tickLabels: { fontSize: 12, fill: "#374151" },
+            tickLabels: {
+            fontSize: 8,
+            angle: data.labels.length > 10 ? -45 : 0, 
+            padding: 5,
+          },
           }}
         />
    

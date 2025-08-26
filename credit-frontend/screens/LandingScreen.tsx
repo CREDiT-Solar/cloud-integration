@@ -61,15 +61,10 @@ export default function LandingScreen() {
         </Text>
 
         <Text style={styles.infoText}>
-          Project information will be added - Monitor your solar energy system with real-time data and insights. Real-time solar production monitoring. Performance alerts and notifications.
-          Monitor your solar energy system with real-time data and insights. Real-time solar production monitoring. Performance alerts and notifications. 
-          Monitor your solar energy system with real-time data and insights. Real-time solar production monitoring. Performance alerts and notifications. 
-          Monitor your solar energy system with real-time data and insights. Real-time solar production monitoring. Performance alerts and notifications.
-          Monitor your solar energy system with real-time data and insights. Real-time solar production monitoring. Performance alerts and notifications. 
-          Monitor your solar energy system with real-time data and insights. Real-time solar production monitoring. Performance alerts and notifications.
-          Monitor your solar energy system with real-time data and insights. Real-time solar production monitoring. Performance alerts and notifications. 
-          Monitor your solar energy system with real-time data and insights. Real-time solar production monitoring. Performance alerts and notifications.
-          Monitor your solar energy system with real-time data and insights. Real-time solar production monitoring. Performance alerts and notifications.
+          Credit Digi Solution is a cutting-edge platform that creates a digital twin of your PV/Battery installation.
+         
+          This platform is customized for African energy landscapes, it helps communities, businesses, and operators 
+          optimize performance, cut costs, and ensure energy resilience.
         </Text>
 
         {/* Logos */}

@@ -27,16 +27,4 @@ const styles = StyleSheet.create({
     },
 });
 
-
-// const Title: React.FC<TitleProps> = ({ title, subtitle }) => {
-//     return (
-//         <div>
-//             <div>
-//                 <h3>{title}</h3>
-//             </div>
-//             {subtitle && <div>{subtitle}</div>}
-//         </div>
-//     );
-// };
-
 export default Title;
