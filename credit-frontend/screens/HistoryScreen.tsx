@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { SafeAreaView, View, StyleSheet, ScrollView, TouchableOpacity, Text } from "react-native";
+import { SafeAreaView, View, StyleSheet, ScrollView, TouchableOpacity, Text, Image } from "react-native";
 import Title from "../components/Title";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -7,7 +7,7 @@ import CardChart from "../components/CardChart";
 import BarchartComponent, { BarChartData } from "../components/BarChart";
 import LineChartComponent from "../components/LineChart";
 import CardReadout from "../components/CardReadout";
-import { Calendar, Plug, RefreshCcw, TrendingUp } from "lucide-react-native";
+import { Calendar, RefreshCcw, TrendingUp } from "lucide-react-native";
 
 type PeriodType = "today" | "week" | "month" | "year";
 
@@ -187,7 +187,7 @@ export default function HistoryScreen() {
           <View style={styles.row}>
             <CardReadout title="Total Production" value="847" units="kWh" subtitle="+12% vs last month" icon={<Calendar size={38} color="#22c55e" />} />
             <CardReadout title="Total Usage" value="623" units="kWh" subtitle="+5% vs last month" icon={<TrendingUp size={38} color="#636466ff" />} />
-            <CardReadout title="Grid" value="224" units="kWh" subtitle="+18% vs last month" icon={<Plug size={38} color="#22c55e" />} />
+            <CardReadout title="Grid" value="224" units="kWh" subtitle="+18% vs last month" icon={<Image source={require("../assets/grid.png")} style={{ width: 38, height: 38 }} resizeMode="contain"/>} />
             <CardReadout title="Self Consumption" value="73.5" units="%" subtitle="+3% vs last month" icon={<RefreshCcw size={38} color="#22c55e" />} />
           </View>
 

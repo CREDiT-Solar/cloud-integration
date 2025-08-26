@@ -1,13 +1,13 @@
 import React from "react";
-import { SafeAreaView, View, StyleSheet, ScrollView } from "react-native";
-import { Battery, Cpu, Home, Plug, Sun, Zap } from "lucide-react-native";
+import { SafeAreaView, View, StyleSheet, ScrollView, Image } from "react-native";
+import { Battery, Cpu, Home, Sun, Zap } from "lucide-react-native";
 import Title from "../components/Title";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import CardReadout from "../components/CardReadout";
 import StatusCard from "../components/StatusCard";
 import CardChart from "../components/CardChart";
-import BarchartComponent, { BarChartData } from '../components/BarChart';
+import BarchartComponent from '../components/BarChart';
 import LineChartComponent, { LineChartData } from "../components/LineChart";
 
 const lineChartData: LineChartData = {
@@ -103,7 +103,7 @@ export default function HistoryScreen() {
               ]} title={"Weather"}              />
 
             <StatusCard
-              icon={<Plug size={24} color="#22c55e" />}
+              icon={<Image source={require("../assets/grid.png")} style={{ width: 38, height: 38 }} resizeMode="contain"/>}
               fields={[
                 { label: "Status", value: "Offline", unit: "" },
                 { label: "Power", value: 0, unit: "kW" },
