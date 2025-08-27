@@ -205,3 +205,33 @@ Description: Returns the total solar energy consumed over a specified period.
 Arguments: JSON body with period: string, one of `hour`, `day`, `24-hour`, `week`, `month`, `year`. Defaults to day
 
 Return Value: JSON object containing total_energy (kWh)
+
+`/get_panel_voltage`
+-
+Method: GET
+
+Description: Returns the current panel voltage
+
+Arguments: None
+
+Return Value: JSON object containing current panel voltage (V)
+
+`/get_panel_current`
+-
+Method: GET
+
+Description: Returns the current panel current
+
+Arguments: None
+
+Return Value: JSON object containing current panel current (A)
+
+`/solar_prod_sum`
+-
+METHOD: POST
+
+Description: Returns the total solar energy for a given period.
+
+Arguments: JSON body with period: string, one of `hour`, `day`, `24-hour`, `week`, `month`, `year`. Defaults to day
+
+Return Value: JSON Object with the total solar energy generated for the given period (kW).

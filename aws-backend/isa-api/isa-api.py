@@ -131,8 +131,8 @@ def historical_solar_prod():
         SELECT t_bucket AS ts, SUM(avg_power)/1000.0 AS site_kW
         FROM (
             SELECT inverter,
-                   {t_bucket} AS t_bucket,
-                   AVG(totalActivePower) AS avg_power
+                {t_bucket} AS t_bucket,
+                AVG(totalActivePower) AS avg_power
             FROM inverter_data
             WHERE timestamp >= %s
             GROUP BY inverter, t_bucket
@@ -556,6 +556,60 @@ def solar_energy_total():
     result = db.query(sql, (start_time,))
     total_energy = float(result[0][0] or 0) * random.uniform(0.95, 1.05)
     return jsonify(total_energy)
+
+
+@app.route("/get_panel_voltage", methods=["GET"])
+@run_safe
+def get_panel_voltage():
+    sql = """
+        SELECT AVG(dcVoltage) 
+        FROM inverter_data
+        WHERE timestamp = (
+            SELECT MAX(timestamp) FROM inverter_data
+        )
+        """
+    results = db.query(sql)
+    if results and results[0][0] is not None:
+        return jsonify(results[0][0])  # index instead of dict
+    else:
+        return jsonify({"error": "No data found"}), 404
+
+
+@app.route("/get_panel_current", methods=["GET"])
+@run_safe
+def get_panel_current():
+    sql = """
+        SELECT SUM(totalActivePower) / NULLIF(AVG(dcVoltage), 0) 
+        FROM inverter_data
+        WHERE timestamp = (
+            SELECT MAX(timestamp) FROM inverter_data
+        )
+        """
+    results = db.query(sql)
+    if results and results[0][0] is not None:
+        return jsonify(results[0][0])  # index instead of dict
+    else:
+        return jsonify({"error": "No data found"}), 404
+
+
+@app.route("/solar_prod_sum", methods=["POST"])
+@run_safe
+def solar_prod_sum():
+    data = request.get_json(force=True)
+    period = data.get("period", "day").lower()
+
+    start_time, interval_seconds, group_by = get_period_range(period)
+
+    sql = """
+        SELECT SUM(totalActivePower)/1000.0 AS total_kWh
+        FROM inverter_data
+        WHERE timestamp >= %s;
+    """
+
+    row = db.query(sql, (start_time,))
+    total = float(row[0][0]) if row and row[0][0] is not None else 0.0
+
+    return jsonify([round(total, 2)])
 
 
 def health():
