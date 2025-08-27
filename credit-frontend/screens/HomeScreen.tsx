@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { SafeAreaView, View, StyleSheet, ScrollView, Image } from 'react-native';
 import Title from '../components/Title';
 import Header from '../components/Header';
@@ -34,6 +34,45 @@ const lineChartData: LineChartData = {
 };
 
 export default function HomeScreen() {
+  const [solarProd, setSolarProd] = useState<number | null>(null);
+  const [batterySOC, setBatterySOC] = useState<number | null>(null);
+  const [energyUsage, setEnergyUsage] = useState<number | null>(null);
+
+  useEffect(() => {
+    //Solar production
+    fetch("http://127.0.0.1:5000/current_solar_prod")
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Fetched data:", data);
+        // API Response example: [[99.77917897727274]]
+        if (Array.isArray(data) && Array.isArray(data[0])) {
+          const value = data[0][0];
+          setSolarProd(value);
+        }
+      })
+      .catch((err) => console.error("Error fetching solar production:", err));
+
+  //   //Battery SOC
+  //   fetch("http://127.0.0.1:5000/get_battery_percentage")
+  //     .then((res) => res.json())
+  //     .then((data) => {
+  //       // API Response example: [63.45]
+  //       const value = data[0];
+  //       setBatterySOC(value);
+  //     })
+  //     .catch((err) => console.error("Error fetching battery SOC:", err));
+
+  //     //Energy Ussage
+  //     fetch("http://127.0.0.1:5000/current_load")
+  //     .then((res) => res.json())
+  //     .then((data) => {
+  //       // API Response example: [2.16614]
+  //       const value = data[0];
+  //       setEnergyUsage(value);
+  //   })
+  //     .catch((err) => console.error("Error fetching energy usage:", err));
+  }, []);
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
@@ -51,10 +90,36 @@ export default function HomeScreen() {
           <Title title="System Overview" subtitle="Monitor your solar energy performance" />
 
           <View style={styles.row}>
-            <CardReadout title="Solar Production" value="3.06" units="kW" subtitle="Current" icon={<Zap size={38} color="#22c55e" />} />
-            <CardReadout title="Battery SOC" value="85" units="%" subtitle="Charging" icon={<Battery size={38} color="#3b82f6" />} />
-            <CardReadout title="Energy Usage" value="1.68" units="kW" subtitle="Current Load" icon={<Home size={38} color="#111" />} />
-            <CardReadout title="Grid Status" value="0" units="kW" subtitle="Offline" icon={<Image source={require("../assets/grid.png")} style={{ width: 38, height: 38 }} resizeMode="contain"/>} />
+            <CardReadout 
+              title="Solar Production" 
+              // value="9.78" 
+              value={solarProd !== null ? solarProd.toFixed(2) : "--"}
+              units="kW" 
+              subtitle="Current" 
+              icon={<Zap size={38} color="#22c55e" />} 
+            />
+            <CardReadout
+              title="Battery SOC" 
+              value="63.45"       
+              // value={batterySOC !== null ? batterySOC.toFixed(2) : "--"}
+              subtitle="Charging" 
+              icon={<Battery size={38} color="#3b82f6" />} 
+            />
+            <CardReadout 
+              title="Energy Usage" 
+              value="2.17" 
+              // value={energyUsage !== null ? energyUsage.toFixed(2) : "--"} 
+              units="kW" 
+              subtitle="Current Load" 
+              icon={<Home size={38} color="#111" />} 
+            />
+            <CardReadout 
+              title="Grid Status" 
+              value="--" 
+              units="kW" 
+              subtitle="Offline" 
+              icon={<Image source={require("../assets/grid.png")} style={{ width: 38, height: 38 }} resizeMode="contain"/>} 
+            />
           </View>
 
           <View style={styles.graphRow}>
@@ -114,6 +179,3 @@ const styles = StyleSheet.create({
     // style for footer
   },
 });
-
-
-
