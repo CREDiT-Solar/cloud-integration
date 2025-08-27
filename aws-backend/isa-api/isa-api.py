@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import atexit
 from ssh_tunnel import SSHTunnelManager
 from database import Database
@@ -29,6 +30,7 @@ db = Database(
 )
 
 app = Flask(__name__)
+CORS(app)
 
 # Battery constants
 BATTERY_MIN_VOLTAGE = 5.0
