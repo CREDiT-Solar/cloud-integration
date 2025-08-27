@@ -37,14 +37,13 @@ CURRENT_THRESHOLD = 0.5
 # Load constants
 BASELINE_KW = 2.0
 DAYLIGHT_FACTOR = 1.0
-COOLING_ALPHA = 0.25  # kW/°C
-HEATING_ALPHA = 0.20  # kW/°C
+COOLING_ALPHA = 0.25
+HEATING_ALPHA = 0.20
 COOLING_THRESHOLD = 22.0
 HEATING_THRESHOLD = 18.0
 
 
 def run_db_query(sql, params=None):
-    """Ensure tunnel, run SQL, return JSON-safe results."""
     try:
         ssh_tunnel.ensure_tunnel()
         results = db.query(sql, params or [])
@@ -54,8 +53,6 @@ def run_db_query(sql, params=None):
 
 
 def run_safe(func):
-    """Decorator to wrap route functions in error handling."""
-
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
@@ -67,10 +64,6 @@ def run_safe(func):
 
 
 def get_period_range(period: str, now=None):
-    """
-    Returns a tuple (start_time, interval_seconds, group_by)
-    based on a standard period string.
-    """
     now = now or datetime.utcnow()
 
     period_map = {
@@ -273,7 +266,7 @@ def get_battery_percentage():
         / (BATTERY_MAX_VOLTAGE - BATTERY_MIN_VOLTAGE)
         * 100
     )
-    percentage = max(0, min(100, percentage))  # Clamp between 0 and 100
+    percentage = max(0, min(100, percentage))
 
     return jsonify([round(percentage, 2)])
 
@@ -310,7 +303,6 @@ def get_battery_state():
 
 
 def calc_battery_percentage(batt_v):
-    """Helper to calculate battery percentage and clamp between 0 and 100"""
     pct = (
         (batt_v - BATTERY_MIN_VOLTAGE)
         / (BATTERY_MAX_VOLTAGE - BATTERY_MIN_VOLTAGE)
@@ -570,7 +562,7 @@ def get_panel_voltage():
         """
     results = db.query(sql)
     if results and results[0][0] is not None:
-        return jsonify(results[0][0])  # index instead of dict
+        return jsonify(results[0][0]) 
     else:
         return jsonify({"error": "No data found"}), 404
 
@@ -587,7 +579,7 @@ def get_panel_current():
         """
     results = db.query(sql)
     if results and results[0][0] is not None:
-        return jsonify(results[0][0])  # index instead of dict
+        return jsonify(results[0][0])
     else:
         return jsonify({"error": "No data found"}), 404
 
