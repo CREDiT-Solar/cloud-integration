@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Dimensions } from "react-native";
 import {
@@ -29,7 +28,7 @@ const BarchartComponent: React.FC<Props> = ({ data, width, height }) => {
   return (
     <VictoryChart
       theme={VictoryTheme.material}
-      domainPadding={{ x: 20, y: 20 }}
+      domainPadding={{  x: 40, y: 20}}
       width={width || screenWidth - 20}
       height={height || 300}
     >
@@ -70,7 +69,10 @@ const BarchartComponent: React.FC<Props> = ({ data, width, height }) => {
 
       {/* Grouped Bar */}
       <VictoryGroup
-        offset={Math.max(12, (200 / data.labels.length))} // adjust data group interval
+          offset={Math.min(50,Math.max(12, 300 / (data.datasets.length * data.labels.length)) // adjust data group interval
+      ) 
+    }
+        style={{ data: { width: 15 } }} 
       >
         {data.datasets.map((set, setIndex) => (
           <VictoryBar
@@ -82,8 +84,8 @@ const BarchartComponent: React.FC<Props> = ({ data, width, height }) => {
             style={{
               data: {
                 fill: set.color || "#4285F4",
-                // Adjust bar width
-                width: Math.min(40, Math.max(8, 300 / data.labels.length)),
+                width: Math.min(25, Math.max(8, 300 / (data.labels.length * data.datasets.length)),  // adjust bar width
+                )
               },
               labels: { fontSize: 8 },
             }}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { SafeAreaView, View, StyleSheet, ScrollView } from 'react-native';
+import { SafeAreaView, View, StyleSheet, ScrollView, Image } from 'react-native';
 import Title from '../components/Title';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -7,13 +7,13 @@ import CardReadout from '../components/CardReadout';
 import PieChartComponent, { PieDataItem } from '../components/PieChart';
 import LineChartComponent, { LineChartData } from '../components/LineChart';
 import CardChart from '../components/CardChart';
-import { Zap, Battery, Home, Plug } from 'lucide-react-native';
+import { Zap, Battery, Home } from 'lucide-react-native';
 
 const pieData: PieDataItem[] = [
   { name: "Solar", population: 35, color: "#22c55e", legendFontColor: "#111", legendFontSize: 12 },
   { name: "Battery", population: 25, color: "#3b82f6", legendFontColor: "#111", legendFontSize: 12 },
-  { name: "Usage", population: 15, color: "#f59e42", legendFontColor: "#111", legendFontSize: 12 },
-  { name: "Grid", population: 25, color: "#6b7280", legendFontColor: "#111", legendFontSize: 12 }
+  { name: "Usage", population: 15, color: "#6b7280", legendFontColor: "#111", legendFontSize: 12 },
+  { name: "Grid", population: 25, color: "#f59e42", legendFontColor: "#111", legendFontSize: 12 }
 ];
 
 const lineChartData: LineChartData = {
@@ -54,7 +54,7 @@ export default function HomeScreen() {
             <CardReadout title="Solar Production" value="3.06" units="kW" subtitle="Current" icon={<Zap size={38} color="#22c55e" />} />
             <CardReadout title="Battery SOC" value="85" units="%" subtitle="Charging" icon={<Battery size={38} color="#3b82f6" />} />
             <CardReadout title="Energy Usage" value="1.68" units="kW" subtitle="Current Load" icon={<Home size={38} color="#111" />} />
-            <CardReadout title="Grid Status" value="0" units="kW" subtitle="Offline" icon={<Plug size={38} color="#f59e42" />} />
+            <CardReadout title="Grid Status" value="0" units="kW" subtitle="Offline" icon={<Image source={require("../assets/grid.png")} style={{ width: 38, height: 38 }} resizeMode="contain"/>} />
           </View>
 
           <View style={styles.graphRow}>

@@ -47,7 +47,7 @@ export default function LineChartComponent({
         theme={VictoryTheme.material}
         domainPadding={{ x: 25, y: 20 }}
         width={width || screenWidth - 20}
-        height={height || 320}
+        height={height || 270}
       >
  
         <VictoryAxis
@@ -61,7 +61,6 @@ export default function LineChartComponent({
         <VictoryAxis
           style={{
             axis: { stroke: "#ccc" },
-            // tickLabels: { fontSize: 12, fill: "#374151" },
             tickLabels: {
             fontSize: 8,
             angle: data.labels.length > 10 ? -45 : 0, 
