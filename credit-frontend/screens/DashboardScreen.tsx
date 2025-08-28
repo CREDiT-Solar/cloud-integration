@@ -37,7 +37,7 @@ const efficiencyData = {
 
 export default function HistoryScreen() {
     // // Solar production
-    // const [solarPower, setSolarPower] = useState<number | null>(null);
+    const [solarPower, setSolarPower] = useState<number | null>(null);
     // const [solarVoltage, setSolarVoltage] = useState<number | null>(null);
     // const [solarCurrent, setSolarCurrent] = useState<number | null>(null);
     // // Inverter
@@ -58,18 +58,18 @@ export default function HistoryScreen() {
     // const [humidity, setHumidity] = useState<number | null>(null);
     // const [irradiance, setIrradiance] = useState<number | null>(null);
   
-    // useEffect(() => {
+    useEffect(() => {
     //   //Solar production
-    //   fetch("http://127.0.0.1:5000/current_solar_prod")
-    //     .then((res) => res.json())
-    //     .then((data) => {
-    //       // API Response: [[102.46017165527344]]
-    //       if (Array.isArray(data) && Array.isArray(data[0])) {
-    //         const value = data[0][0];
-    //         setSolarPower(value !== null ? value.toFixed(2) : "--");
-    //       }
-    //     })
-    //     .catch((err) => console.error("Error fetching solar production:", err));
+      fetch("http://127.0.0.1:5000/current_solar_prod")
+        .then((res) => res.json())
+        .then((data) => {
+          // API Response: [[102.46017165527344]]
+          if (Array.isArray(data) && Array.isArray(data[0])) {
+            const value = data[0][0];
+            setSolarPower(value !== null ? value.toFixed(2) : "--");
+          }
+        })
+        .catch((err) => console.error("Error fetching solar production:", err));
   
     //   fetch("http://127.0.0.1:5000/get_panel_voltage")
     //     .then((res) => res.json())
@@ -200,7 +200,7 @@ export default function HistoryScreen() {
     //   })
     //     .catch((err) => console.error("Error fetching irradiance:", err));
 
-    // }, []);
+    }, []);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -281,7 +281,8 @@ export default function HistoryScreen() {
               icon={<Zap size={24} color="#22c55e" />}
               fields={[
                 // { label: "Power", value: 4.75, unit: "kW", highlight: true },
-                { label: "Power", value: 4.75, unit: "kW" },
+                // { label: "Power", value: 4.75, unit: "kW" },
+                { label: "Power", value: solarPower ?? "--", unit: "kW" },
                 { label: "Voltage", value: 0, unit: "V" },
                 { label: "Current", value: 0, unit: "A" },
               ]} title={"Solar Production"}              />
