@@ -52,25 +52,25 @@ export default function HomeScreen() {
       })
       .catch((err) => console.error("Error fetching solar production:", err));
 
-  //   //Battery SOC
-  //   fetch("http://127.0.0.1:5000/get_battery_percentage")
-  //     .then((res) => res.json())
-  //     .then((data) => {
-  //       // API Response example: [63.45]
-  //       const value = data[0];
-  //       setBatterySOC(value);
-  //     })
-  //     .catch((err) => console.error("Error fetching battery SOC:", err));
+    //  Battery SOC
+    fetch("http://127.0.0.1:5000/get_battery_percentage")
+      .then((res) => res.json())
+      .then((data) => {
+        // API Response example: [63.45]
+        const value = data[0];
+        setBatterySOC(value);
+      })
+      .catch((err) => console.error("Error fetching battery SOC:", err));
 
-  //     //Energy Ussage
-  //     fetch("http://127.0.0.1:5000/current_load")
-  //     .then((res) => res.json())
-  //     .then((data) => {
-  //       // API Response example: [2.16614]
-  //       const value = data[0];
-  //       setEnergyUsage(value);
-  //   })
-  //     .catch((err) => console.error("Error fetching energy usage:", err));
+      //Energy Ussage
+    fetch("http://127.0.0.1:5000/current_load")
+      .then((res) => res.json())
+      .then((data) => {
+        // API Response example: [2.16614]
+        const value = data[0];
+        setEnergyUsage(value);
+    })
+      .catch((err) => console.error("Error fetching energy usage:", err));
   }, []);
 
   return (
@@ -100,15 +100,15 @@ export default function HomeScreen() {
             />
             <CardReadout
               title="Battery SOC" 
-              value="63.45"       
-              // value={batterySOC !== null ? batterySOC.toFixed(2) : "--"}
+              // value="63.45"       
+              value={batterySOC !== null ? batterySOC.toFixed(2) : "--"}
               subtitle="Charging" 
               icon={<Battery size={38} color="#3b82f6" />} 
             />
             <CardReadout 
               title="Energy Usage" 
-              value="2.17" 
-              // value={energyUsage !== null ? energyUsage.toFixed(2) : "--"} 
+              // value="2.17" 
+              value={energyUsage !== null ? energyUsage.toFixed(2) : "--"} 
               units="kW" 
               subtitle="Current Load" 
               icon={<Home size={38} color="#111" />} 
