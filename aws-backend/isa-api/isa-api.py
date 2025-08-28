@@ -1,10 +1,14 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import atexit
 from ssh_tunnel import SSHTunnelManager
 from database import Database
 import datetime
 from datetime import datetime, timedelta
 import random
+import mysql.connector
+import pymysql
+from queue import Queue
 
 SSH_CONFIG = {
     "ssh_host": "isapc7.york.ac.uk",
@@ -20,15 +24,23 @@ DB_CONFIG = {"user": "solardb", "password": "solardb", "name": "solar_db"}
 ssh_tunnel = SSHTunnelManager(**SSH_CONFIG)
 ssh_tunnel.start()
 
-db = Database(
-    host="127.0.0.1",
-    port=ssh_tunnel.local_bind_port,
-    user=DB_CONFIG["user"],
-    password=DB_CONFIG["password"],
-    name=DB_CONFIG["name"],
-)
+POOL_SIZE = 16
+DB_POOL = Queue(maxsize=POOL_SIZE)
+
+for _ in range(POOL_SIZE):
+    conn = pymysql.connect(
+        host="127.0.0.1",
+        port=ssh_tunnel.local_bind_port,
+        user=DB_CONFIG["user"],
+        password=DB_CONFIG["password"],
+        database=DB_CONFIG["name"],
+        autocommit=True,
+        cursorclass=pymysql.cursors.DictCursor,
+    )
+    DB_POOL.put(conn)
 
 app = Flask(__name__)
+CORS(app)
 
 # Battery constants
 BATTERY_MIN_VOLTAGE = 5.0
@@ -44,12 +56,17 @@ HEATING_THRESHOLD = 18.0
 
 
 def run_db_query(sql, params=None):
+    conn = DB_POOL.get()
     try:
-        ssh_tunnel.ensure_tunnel()
-        results = db.query(sql, params or [])
-        return jsonify(results)
+        with conn.cursor() as cursor:
+            cursor.execute(sql, params or ())
+            results = cursor.fetchall()
+        return results
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        print("DB error in run_db_query:", e)
+        raise
+    finally:
+        DB_POOL.put(conn)
 
 
 def run_safe(func):
@@ -86,6 +103,7 @@ def get_period_range(period: str, now=None):
 
 
 @app.route("/current_solar_prod", methods=["GET"])
+@run_safe
 def run_current_solar_prod():
     sql = """
     SELECT SUM(avg_power)/1000.0 AS site_kW_5min_avg
@@ -96,7 +114,8 @@ def run_current_solar_prod():
         GROUP BY inverter
     ) t;
     """
-    return run_db_query(sql)
+    results = run_db_query(sql)
+    return jsonify(results)
 
 
 @app.route("/historical_solar_prod", methods=["POST"])
@@ -134,20 +153,25 @@ def historical_solar_prod():
         ORDER BY t_bucket;
     """
 
-    return run_db_query(sql, (start_time,))
+    results = run_db_query(sql, (start_time,))
+
+    return jsonify({"historical_solar_prod": results})
 
 
 @app.route("/get_voltage", methods=["GET"])
+@run_safe
 def get_voltage():
     sql = """
     SELECT AVG((L1acVoltage+L2acVoltage+L3acVoltage)/3) AS avg_voltage
     FROM inverter_data
     WHERE timestamp >= NOW() - INTERVAL 5 MINUTE;
     """
-    return run_db_query(sql)
+    results = run_db_query(sql)
+    return jsonify(results)
 
 
 @app.route("/get_current", methods=["GET"])
+@run_safe
 def get_current():
     sql = """
         SELECT 
@@ -155,7 +179,8 @@ def get_current():
         FROM inverter_data
         WHERE timestamp >= NOW() - INTERVAL 5 MINUTE;
         """
-    return run_db_query(sql)
+    results = run_db_query(sql)
+    return jsonify(results)
 
 
 @app.route("/solar_energy_totals", methods=["POST"])
@@ -171,11 +196,14 @@ def solar_energy_totals():
         FROM inverter_data
         WHERE timestamp >= %s;
     """
-    results = db.query(sql, (start_time,))
-    return jsonify(results)
+    results = run_db_query(sql, (start_time,))
+
+    total_energy = results[0].get("total_energy") if results else 0
+    return jsonify({"solar_energy_totals": total_energy})
 
 
 @app.route("/get_weather_temperature", methods=["GET"])
+@run_safe
 def get_weather_temperature():
     sql = """
         SELECT CS240DM_Temperature AS latest_temperature
@@ -183,10 +211,12 @@ def get_weather_temperature():
         ORDER BY timestamp DESC
         LIMIT 1;
         """
-    return run_db_query(sql)
+    results = run_db_query(sql)
+    return jsonify(results)
 
 
 @app.route("/get_humidity", methods=["GET"])
+@run_safe
 def get_humidity():
     sql = """
             SELECT RH AS humidity
@@ -194,10 +224,12 @@ def get_humidity():
             ORDER BY timestamp DESC
             LIMIT 1;
         """
-    return run_db_query(sql)
+    results = run_db_query(sql)
+    return jsonify(results)
 
 
 @app.route("/get_irradiance", methods=["GET"])
+@run_safe
 def get_irradiance():
     sql = """
         SELECT
@@ -207,10 +239,12 @@ def get_irradiance():
         ORDER BY timestamp DESC
         LIMIT 1;
         """
-    return run_db_query(sql)
+    results = run_db_query(sql)
+    return jsonify(results)
 
 
 @app.route("/get_battery_voltage", methods=["GET"])
+@run_safe
 def get_battery_voltage():
     sql = """
         SELECT BattV
@@ -218,7 +252,8 @@ def get_battery_voltage():
         ORDER BY timestamp DESC
         LIMIT 1;
         """
-    return run_db_query(sql)
+    results = run_db_query(sql)
+    return jsonify(results)
 
 
 @app.route("/get_battery_current", methods=["GET"])
@@ -231,18 +266,28 @@ def get_battery_current():
         ON i.timestamp = g.timestamp
         ORDER BY g.timestamp DESC
         LIMIT 1;
-        """
-    results = db.query(sql)
+    """
+    results = run_db_query(sql)
 
-    if not results or not results[0][0] or not results[0][1]:
+    if (
+        not results
+        or not results[0].get("totalActivePower")
+        or not results[0].get("BattV")
+    ):
         return jsonify({"error": "No valid data found"}), 404
 
-    power_w = results[0][0]  # totalActivePower
-    batt_v = results[0][1]  # BattV
+    power_w = results[0]["totalActivePower"]
+    batt_v = results[0]["BattV"]
 
     battery_current = power_w / batt_v if batt_v else None
 
-    return jsonify([round(battery_current, 2) if battery_current else None])
+    return jsonify(
+        {
+            "battery_current": (
+                round(battery_current, 2) if battery_current is not None else None
+            )
+        }
+    )
 
 
 @app.route("/get_battery_percentage", methods=["GET"])
@@ -253,13 +298,13 @@ def get_battery_percentage():
         FROM rooftop_datalogger
         ORDER BY timestamp DESC
         LIMIT 1;
-        """
-    results = db.query(sql)
+    """
+    results = run_db_query(sql)
 
-    if not results:
+    if not results or results[0].get("BattV") is None:
         return jsonify({"error": "No battery voltage data found"}), 404
 
-    batt_v = results[0][0]
+    batt_v = results[0]["BattV"]
 
     percentage = (
         (batt_v - BATTERY_MIN_VOLTAGE)
@@ -268,7 +313,7 @@ def get_battery_percentage():
     )
     percentage = max(0, min(100, percentage))
 
-    return jsonify([round(percentage, 2)])
+    return jsonify({"battery_percentage": round(percentage, 2)})
 
 
 @app.route("/get_battery_state", methods=["GET"])
@@ -281,14 +326,18 @@ def get_battery_state():
         ON i.timestamp = r.timestamp
         ORDER BY r.timestamp DESC
         LIMIT 1;
-        """
-    results = db.query(sql)
+    """
+    results = run_db_query(sql)
 
-    if not results:
+    if (
+        not results
+        or not results[0].get("totalActivePower")
+        or not results[0].get("BattV")
+    ):
         return jsonify({"error": "No battery data found"}), 404
 
-    power_w = results[0][0]  # totalActivePower
-    batt_v = results[0][1]  # BattV
+    power_w = results[0]["totalActivePower"]
+    batt_v = results[0]["BattV"]
 
     battery_current = power_w / batt_v if batt_v else 0
 
@@ -299,7 +348,7 @@ def get_battery_state():
     else:
         state = "idle"
 
-    return jsonify([state])
+    return jsonify({"battery_state": state})
 
 
 def calc_battery_percentage(batt_v):
@@ -317,10 +366,8 @@ def battery_percentage_timeseries():
     data = request.get_json() or {}
     period = data.get("period", "day").lower()
 
-    # Get start time and interval info
     start_time, interval_seconds, group_by = get_period_range(period)
 
-    # Map group_by to SQL expression for grouping
     group_sql_map = {
         "5min": "FLOOR(UNIX_TIMESTAMP(timestamp)/300)",  # 5-min intervals
         "hour": "HOUR(timestamp)",  # hourly
@@ -330,7 +377,6 @@ def battery_percentage_timeseries():
     }
     group_sql = group_sql_map.get(group_by, "timestamp")
 
-    # SQL template
     sql = f"""
         SELECT
             {group_sql} AS t_group,
@@ -341,33 +387,35 @@ def battery_percentage_timeseries():
         ORDER BY t_group ASC;
     """
 
-    rows = db.query(sql, (start_time,))
+    rows = run_db_query(sql, (start_time,))
 
-    # Convert t_group to datetime and calculate battery percentage
     results = []
-    for tg, batt_v in rows:
-        if group_by == "5min" or group_by == "6hour":
+    for row in rows:
+        tg = row.get("t_group")
+        batt_v = row.get("avg_batt_v")
+
+        if tg is None or batt_v is None:
+            continue
+
+        if group_by in ["5min", "6hour"]:
             ts = datetime.fromtimestamp(int(tg) * interval_seconds)
         elif group_by == "hour":
-            tg = int(tg)
-            ts = start_time.replace(hour=tg, minute=0, second=0, microsecond=0)
+            ts = start_time.replace(hour=int(tg), minute=0, second=0, microsecond=0)
         elif group_by == "day":
-            ts = tg  # DATE() returns a date object, usually safe
+            ts = tg
         elif group_by == "week":
-            tg = int(tg)
             year_start = datetime(start_time.year, 1, 1)
-            ts = year_start + timedelta(weeks=tg - 1)
+            ts = year_start + timedelta(weeks=int(tg) - 1)
         else:
             ts = tg
 
         pct = round(calc_battery_percentage(batt_v), 1)
         results.append([ts.isoformat() if hasattr(ts, "isoformat") else str(ts), pct])
 
-    return jsonify(results)
+    return jsonify({"battery_percentage_timeseries": results})
 
 
 def compute_load(irr1, irr2, temp_c):
-    # Compute synthetic load in kW from irradiance and temperature
     if irr1 is None and irr2 is None:
         irr_avg = 0
     else:
@@ -392,34 +440,48 @@ def get_current_load():
         FROM ground_datalogger
         ORDER BY timestamp DESC
         LIMIT 1;
-        """
-    rows = db.query(sql)
+    """
+    rows = run_db_query(sql)
+
     if not rows:
         return jsonify({"error": "No data"}), 404
 
-    irr1, irr2, temp = rows[0]  # tuple indexing
+    irr1 = rows[0].get("SR30_Irr")
+    irr2 = rows[0].get("SR30_Irr_2")
+    temp = rows[0].get("PTemp_C")
+
     load_kw = compute_load(irr1, irr2, temp)
-    return jsonify([load_kw])
+
+    return jsonify({"current_load": load_kw})
 
 
 @app.route("/total_load_today", methods=["GET"])
 @run_safe
 def get_total_load_today():
     midnight = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+
     sql = """
         SELECT timestamp, SR30_Irr, SR30_Irr_2, PTemp_C
         FROM rooftop_datalogger
         WHERE timestamp >= %s
         ORDER BY timestamp ASC;
-        """
-    rows = db.query(sql, (midnight,))
+    """
+    rows = run_db_query(sql, (midnight,))
+
     if not rows:
         return jsonify({"error": "No data"}), 404
 
     total_kwh = 0.0
     for i in range(1, len(rows)):
-        t1, irr1a, irr2a, temp1 = rows[i - 1]
-        t2, irr1b, irr2b, temp2 = rows[i]
+        t1 = rows[i - 1]["timestamp"]
+        irr1a = rows[i - 1].get("SR30_Irr")
+        irr2a = rows[i - 1].get("SR30_Irr_2")
+        temp1 = rows[i - 1].get("PTemp_C")
+
+        t2 = rows[i]["timestamp"]
+        irr1b = rows[i].get("SR30_Irr")
+        irr2b = rows[i].get("SR30_Irr_2")
+        temp2 = rows[i].get("PTemp_C")
 
         load1 = compute_load(irr1a, irr2a, temp1)
         load2 = compute_load(irr1b, irr2b, temp2)
@@ -427,29 +489,35 @@ def get_total_load_today():
         delta_h = (t2 - t1).total_seconds() / 3600.0
         total_kwh += 0.5 * (load1 + load2) * delta_h
 
-    return jsonify([total_kwh])
+    return jsonify({"total_load_today": round(total_kwh, 2)})
 
 
 @app.route("/peak_load_today", methods=["GET"])
 @run_safe
 def get_peak_load_today():
     midnight = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+
     sql = """
         SELECT SR30_Irr, SR30_Irr_2, PTemp_C
         FROM rooftop_datalogger
         WHERE timestamp >= %s
         ORDER BY timestamp ASC;
-        """
-    rows = db.query(sql, (midnight,))
+    """
+    rows = run_db_query(sql, (midnight,))
+
     if not rows:
         return jsonify({"error": "No data"}), 404
 
     max_kw = 0.0
-    for irr1, irr2, temp in rows:
+    for row in rows:
+        irr1 = row.get("SR30_Irr")
+        irr2 = row.get("SR30_Irr_2")
+        temp = row.get("PTemp_C")
+
         load_kw = compute_load(irr1, irr2, temp)
         max_kw = max(max_kw, load_kw)
 
-    return jsonify([max_kw])
+    return jsonify({"peak_load_today": round(max_kw, 2)})
 
 
 @app.route("/grid_self_consumption", methods=["POST"])
@@ -469,15 +537,19 @@ def grid_self_consumption():
         ORDER BY ts ASC;
     """
 
-    results = db.query(sql, (start_time,))
+    results = run_db_query(sql, (start_time,))
 
     output = []
-    for ts, val in results:
+    for row in results:
+        ts = row.get("ts")
+        val = row.get("self_consumption_percent")
+
         val = (
             max(0, min(100, val * random.uniform(0.95, 1.05))) if val is not None else 0
         )
-        output.append([ts, val])
-    return jsonify([output])
+        output.append([ts.isoformat() if hasattr(ts, "isoformat") else str(ts), val])
+
+    return jsonify({"grid_self_consumption": output})
 
 
 @app.route("/grid_status", methods=["POST"])
@@ -496,15 +568,20 @@ def grid_status():
         GROUP BY FLOOR(UNIX_TIMESTAMP(timestamp)/{interval_sec})
         ORDER BY ts;
     """
-    results = db.query(sql, (start_time,))
+
+    results = run_db_query(sql, (start_time,))
 
     response = []
-    for ts, solar in results:
-        solar = float(solar or 0)
+    for row in results:
+        ts = row.get("ts")
+        solar = float(row.get("solar_power") or 0)
         load = solar * (1 + random.uniform(0.1, 0.3))
         grid_usage = max(load - solar, 0)
-        response.append([ts.isoformat(), grid_usage])
-    return jsonify(response)
+        response.append(
+            [ts.isoformat() if hasattr(ts, "isoformat") else str(ts), grid_usage]
+        )
+
+    return jsonify({"grid_status": response})
 
 
 @app.route("/solar_energy_usage", methods=["POST"])
@@ -524,13 +601,15 @@ def solar_energy_usage():
         ORDER BY ts;
     """
 
-    results = db.query(sql, (start_time,))
+    results = run_db_query(sql, (start_time,))
 
     output = []
-    for ts, energy in results:
-        energy = float(energy or 0) * random.uniform(0.95, 1.05)
-        output.append([ts.isoformat(), energy])
-    return jsonify(output)
+    for row in results:
+        ts = row.get("ts")
+        energy = float(row.get("energy_kwh") or 0) * random.uniform(0.95, 1.05)
+        output.append([ts.isoformat() if hasattr(ts, "isoformat") else str(ts), energy])
+
+    return jsonify({"solar_energy_usage": output})
 
 
 @app.route("/solar_energy_total", methods=["POST"])
@@ -545,24 +624,28 @@ def solar_energy_total():
         FROM inverter_data
         WHERE timestamp >= %s;
     """
-    result = db.query(sql, (start_time,))
-    total_energy = float(result[0][0] or 0) * random.uniform(0.95, 1.05)
-    return jsonify(total_energy)
+    results = run_db_query(sql, (start_time,))
+
+    total_energy = float(results[0].get("total_energy_kwh") or 0) * random.uniform(
+        0.95, 1.05
+    )
+    return jsonify({"solar_energy_total": total_energy})
 
 
 @app.route("/get_panel_voltage", methods=["GET"])
 @run_safe
 def get_panel_voltage():
     sql = """
-        SELECT AVG(dcVoltage) 
+        SELECT AVG(dcVoltage) AS avg_dc_voltage
         FROM inverter_data
         WHERE timestamp = (
             SELECT MAX(timestamp) FROM inverter_data
         )
-        """
-    results = db.query(sql)
-    if results and results[0][0] is not None:
-        return jsonify(results[0][0]) 
+    """
+    results = run_db_query(sql)
+
+    if results and results[0].get("avg_dc_voltage") is not None:
+        return jsonify({"panel_voltage": results[0]["avg_dc_voltage"]})
     else:
         return jsonify({"error": "No data found"}), 404
 
@@ -571,15 +654,17 @@ def get_panel_voltage():
 @run_safe
 def get_panel_current():
     sql = """
-        SELECT SUM(totalActivePower) / NULLIF(AVG(dcVoltage), 0) 
+        SELECT 
+            SUM(totalActivePower) / NULLIF(AVG(dcVoltage), 0) AS panel_current
         FROM inverter_data
         WHERE timestamp = (
             SELECT MAX(timestamp) FROM inverter_data
         )
-        """
-    results = db.query(sql)
-    if results and results[0][0] is not None:
-        return jsonify(results[0][0])
+    """
+    results = run_db_query(sql)
+
+    if results and results[0].get("panel_current") is not None:
+        return jsonify({"panel_current": results[0]["panel_current"]})
     else:
         return jsonify({"error": "No data found"}), 404
 
@@ -598,10 +683,10 @@ def solar_prod_sum():
         WHERE timestamp >= %s;
     """
 
-    row = db.query(sql, (start_time,))
-    total = float(row[0][0]) if row and row[0][0] is not None else 0.0
+    results = run_db_query(sql, (start_time,))
+    total = float(results[0].get("total_kWh") or 0.0)
 
-    return jsonify([round(total, 2)])
+    return jsonify({"solar_prod_sum": round(total, 2)})
 
 
 def health():
@@ -611,7 +696,6 @@ def health():
 
 @atexit.register
 def shutdown():
-    db.close()
     ssh_tunnel.stop()
 
 
