@@ -25,7 +25,7 @@ export default function Header({
       <View style={styles.centerBlock}>
         <CloudSun color="#fbbf24" size={22} style={{ marginRight: 5 }} />
         <Text style={[styles.weatherText, isDark && styles.darkText]}>
-          Sunny, 30°C
+          Sunny, 17°C
         </Text>
       </View>
 

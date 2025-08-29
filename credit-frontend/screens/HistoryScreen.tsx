@@ -9,10 +9,10 @@ import LineChartComponent from "../components/LineChart";
 import CardReadout from "../components/CardReadout";
 import { Calendar, RefreshCcw, TrendingUp } from "lucide-react-native";
 
-type PeriodType = "today" | "week" | "month" | "year";
+type PeriodType = "day" | "week" | "month" | "year";
 
 const SolarProdData = {
-    today: {
+    day: {
     labels: Array.from({ length: 24 }, (_, i) => `${i}:00`),
     legend: ["Energy (kWh)"],
     datasets: [
@@ -59,7 +59,7 @@ const SolarProdData = {
 };
 
 const BatterytData = {
-  today: {
+  day: {
     labels: Array.from({ length: 24 }, (_, i) => `${i}:00`),
     legend: ["Battery Level (%)"],
     datasets: [
@@ -106,7 +106,7 @@ const BatterytData = {
 };
 
 const ProdUsageData: Record<PeriodType, BarChartData> = {
-  today: {
+  day: {
     labels: Array.from({ length: 24 }, (_, i) => `${i}:00`),
     legend: ["Production", "Energy Usage"],
     datasets: [
@@ -166,7 +166,7 @@ const ProdUsageData: Record<PeriodType, BarChartData> = {
 
 
 export default function HistoryScreen() {
-  const [period, setPeriod] = useState<PeriodType>("today");
+  const [period, setPeriod] = useState<PeriodType>("day");
 
   return (
     <SafeAreaView style={styles.container}>
@@ -192,7 +192,7 @@ export default function HistoryScreen() {
           </View>
 
           <View style={styles.menuRow}>
-            {(["today", "week", "month", "year"] as PeriodType[]).map((p) => (
+            {(["day", "week", "month", "year"] as PeriodType[]).map((p) => (
               <TouchableOpacity
                 key={p}
                 style={[styles.menuButton, period === p && styles.menuButtonActive]}
