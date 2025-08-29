@@ -84,7 +84,27 @@ Description: Returns the most recent solar irradiance readings from the ground d
 
 Arguments: None
 
-Return Value: JSON object with irradiance values in watts per square meter (W/m²). 0 is SR30 value, 1 is SR05 value
+Return Value: JSON object with irradiance values in watts per square meter (W/m²).
+
+`/get_windspeed`
+-
+Method: GET
+
+Description: Returns the most recent windspeed readings from the ground datalogger. Gets WS_ms, WS_ms_2 and WindDir
+
+Arguments: None
+
+Return Value: JSON object with windspeed values in m/s and wind direction in degrees.
+
+`/get_carbon_emissions`
+-
+Method: GET
+
+Description: Calculates the current carbon emissions saved by the solar system.
+
+Arguments: None
+
+Return Value: JSON object with carbon emissions in KG.
 
 `/get_battery_voltage`
 -
