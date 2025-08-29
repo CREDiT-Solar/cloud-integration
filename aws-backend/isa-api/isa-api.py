@@ -2,11 +2,9 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import atexit
 from ssh_tunnel import SSHTunnelManager
-from database import Database
 import datetime
 from datetime import datetime, timedelta
 import random
-import mysql.connector
 import pymysql
 from queue import Queue
 
@@ -24,7 +22,7 @@ DB_CONFIG = {"user": "solardb", "password": "solardb", "name": "solar_db"}
 ssh_tunnel = SSHTunnelManager(**SSH_CONFIG)
 ssh_tunnel.start()
 
-POOL_SIZE = 16
+POOL_SIZE = 32
 DB_POOL = Queue(maxsize=POOL_SIZE)
 
 for _ in range(POOL_SIZE):
@@ -202,7 +200,7 @@ def solar_energy_totals():
     return jsonify({"solar_energy_totals": total_energy})
 
 
-@app.route("/get_weather_temperature", methods=["GET"])
+@app.route("/get_temperature", methods=["GET"])
 @run_safe
 def get_weather_temperature():
     sql = """
@@ -241,6 +239,33 @@ def get_irradiance():
         """
     results = run_db_query(sql)
     return jsonify(results)
+
+
+@app.route("/get_windspeed", methods=["GET"])
+@run_safe
+def get_windspeed():
+    sql = """
+            SELECT WS_ms, WS_ms_2, WindDir
+            FROM ground_datalogger
+            ORDER BY timestamp DESC
+            LIMIT 1;
+        """
+    results = run_db_query(sql)
+    return jsonify(results)
+
+
+@app.route("/get_carbon_emissions", methods=["GET"])
+@run_safe
+def get_carbon_emissions():
+    sql = """
+            SELECT totalEnergy
+            FROM inverter_data
+            ORDER BY timestamp DESC
+            LIMIT 1;
+        """
+    results = run_db_query(sql)
+    totalEnergy = results[0]["totalEnergy"] if results else 0
+    return jsonify({"carbon_emissions": totalEnergy / 1000 * 0.196})
 
 
 @app.route("/get_battery_voltage", methods=["GET"])
