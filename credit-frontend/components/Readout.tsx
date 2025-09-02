@@ -1,10 +1,10 @@
-
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 
 export interface ReadoutProps {
   title: string;
-  value: string | (() => string);
+  // value: string | (() => string);
+  value: string | number | (() => string | number);
   units?: string;
   subtitle?: string;
   icon?: React.ReactNode;
@@ -25,10 +25,12 @@ const Readout: React.FC<ReadoutProps> = ({
       <View style={styles.textContainer}>
         <Text style={styles.title}>{title}</Text>
 
-        <View style={styles.valueRow}>
-          <Text style={styles.value}>{displayValue}</Text>
+      <View style={styles.valueRow}>
+        <Text style={styles.value}>
+          {displayValue}
           {units && <Text style={styles.units}> {units}</Text>}
-        </View>
+        </Text>
+      </View>
 
         {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
       </View>
@@ -54,19 +56,20 @@ const styles = StyleSheet.create({
     color: "#111",
     marginBottom: 2,
   },
-  valueRow: {
-    flexDirection: "row",
-    alignItems: "flex-end",
+   valueRow: {
+    flexDirection: "row",   
+    alignItems: "flex-end", 
   },
   value: {
-    fontSize: 20,
+    fontSize: 20,          
     fontWeight: "bold",
     color: "#111",
   },
   units: {
-    fontSize: 13,
-    fontWeight: "bold",
-    color: "#111",
+    fontSize: 14,          
+    fontWeight: "600",
+    color: "#555",         
+    marginLeft: 4,          
   },
   subtitle: {
     fontSize: 13,

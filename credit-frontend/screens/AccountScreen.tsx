@@ -133,23 +133,6 @@ const handleCancel = () => {
           />
         </View>
 
-        {/* Finance Section */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Finance</Text>
-
-          <FinanceRow
-            label="Electricity Access Time"
-            description="Electricity availability hours this month"
-          />
-          <FinanceRow
-            label="Energy Saving"
-            description="Energy cost savings this month"
-          />
-          <FinanceRow
-            label="Estimated Lifetime Savings"
-            description="Estimated total cost savings over 10 years"
-          />
-        </View>
       </ScrollView>
 
       {/* Footer */}

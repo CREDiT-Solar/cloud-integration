@@ -7,6 +7,9 @@ import {
   Settings,
   User,
   SlidersVertical,
+  Landmark,
+  CloudAlert,
+  Users,
 } from "lucide-react-native";
 import { useNavigation } from "@react-navigation/native";
 
@@ -16,7 +19,10 @@ const navItems = [
   { id: "History", icon: History, label: "History" },
   { id: "Settings", icon: Settings, label: "Settings" },
   { id: "Account", icon: User, label: "Account" },
-  { id: "Control", icon: SlidersVertical, label: "Control Hub" },
+  { id: "Control", icon: SlidersVertical, label: "Digi Control Hub" },
+  { id: "Finance", icon: Landmark, label: "Finance" },
+  { id: "Fault", icon: CloudAlert, label: "Fault Monitoring" },
+  { id: "User", icon: Users, label: "User Dashboard" },
 ];
 
 
