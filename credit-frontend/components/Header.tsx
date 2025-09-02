@@ -24,9 +24,7 @@ export default function Header({
 
       <View style={styles.centerBlock}>
         <CloudSun color="#fbbf24" size={22} style={{ marginRight: 5 }} />
-        <Text style={[styles.weatherText, isDark && styles.darkText]}>
-          Sunny, 17°C
-        </Text>
+        <Text style={[styles.weatherText, isDark && styles.darkText]}>Sunny, 30°C</Text>
       </View>
 
       <View style={styles.rightBlock}>
@@ -38,7 +36,7 @@ export default function Header({
           )}
         </TouchableOpacity>
         <Bell color={isDark ? "#fff" : "#111"} size={22} style={{ marginLeft: 13 }} />
-        {/* <Text style={styles.sIcon}>G</Text> */}
+        {/* <Text style={styles.sIcon}>S</Text> */}
         <Text style={[styles.userName, isDark && styles.darkText]}>{userName}</Text>
       </View>
     </View>

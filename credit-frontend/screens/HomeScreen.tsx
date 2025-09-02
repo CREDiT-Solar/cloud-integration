@@ -34,7 +34,7 @@ export default function HomeScreen() {
       try {
         const data = await getRequest("/current_solar_prod");
         console.log("Fetched current_solar_prod:", data);
-        // : [ { "site_kW_5min_avg": 55.33 } ]
+        // [ { "site_kW_5min_avg": 55.33 } ]
         if (Array.isArray(data) && data.length > 0 && typeof data[0] === 'object' && data[0] !== null) {
           const value = (data[0] as any).site_kW_5min_avg;
           if (typeof value === 'number') setSolarProd(value);
@@ -50,7 +50,7 @@ export default function HomeScreen() {
       try {
         const data = await getRequest("/get_battery_percentage");
         console.log("Fetched get_battery_percentage:", data);
-        // : { "battery_percentage": 64.16 }
+        // { "battery_percentage": 64.16 }
         if (data && typeof data === "object" && "battery_percentage" in data) {
           const value = (data as any).battery_percentage;
           if (typeof value === 'number') setBatterySOC(value);
@@ -66,7 +66,7 @@ export default function HomeScreen() {
       try {
         const data = await getRequest("/current_load");
         console.log("Fetched current_load:", data);
-        // : { "current_load": 2.16614 }
+        // { "current_load": 2.16614 }
         if (data && typeof data === "object" && "current_load" in data) {
           const value = (data as any).current_load;
           if (typeof value === 'number') setEnergyUsage(value);
@@ -87,30 +87,11 @@ export default function HomeScreen() {
         if (!Array.isArray(list) || list.length === 0) return;
 
         const prodData = [...list].sort((a, b) => (a.ts > b.ts ? 1 : -1));
-
         const labels = prodData.map((item) => item.ts.slice(11, 16));
-
         const productionValues = prodData.map((item) => item.site_kW);
 
-        const usageValues = prodData.map((item) => {
-          const scalingFactor = 1.2 + Math.random() * 0.5; 
-          const baseLoad = 10; 
-          return Math.min(item.site_kW * scalingFactor + baseLoad, 80); 
-        });
-
-        // const usageValues = prodData.map((_, idx) => {
-        //   const n = prodData.length;
-        //   if (idx < Math.max(2, Math.floor(n * 0.1))) {
-        //     // early morning
-        //     return +(0.6 + Math.random() * 0.7).toFixed(2);
-        //   } else if (idx < Math.floor(n * 0.6)) {
-        //     // daytime
-        //     return +(2 + Math.random() * 2).toFixed(2);
-        //   } else {
-        //     // evening/night
-        //     return +(3.5 + Math.random() * 2).toFixed(2);
-        //   }
-        // });
+        const usageData = [25, 58, 70, 65, 52, 42, 32, 56, 59, 62, 66, 68, 78, 82, 85, 87, 65, 50];
+        const usageValues = usageData.slice(0, prodData.length); 
 
         const chartData: LineChartData = {
           labels,
@@ -186,7 +167,7 @@ export default function HomeScreen() {
 
           <View style={styles.graphRow}>
             <View style={styles.graphBlock}>
-              <CardChart title="Today's Energy Flow (kWh)">
+              <CardChart title="Today's Energy Flow">
                 <PieChartComponent data={pieData} width={340} height={280} />
               </CardChart>
             </View>

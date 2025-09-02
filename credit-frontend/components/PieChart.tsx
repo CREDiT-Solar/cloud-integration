@@ -37,7 +37,7 @@ export default function PieChartComponent({
         height={height || 320}
         colorScale={chartData.map((d) => d.fill)} 
         labels={({ datum }: { datum: { x: string; y: number } }) =>
-          `${datum.x}\n${datum.y}`
+          `${datum.x}\n${datum.y} kWh`
         }
         style={{
           labels: {

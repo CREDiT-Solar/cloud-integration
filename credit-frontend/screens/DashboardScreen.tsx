@@ -20,12 +20,12 @@ const lineChartData: LineChartData = {
       color: (opacity = 1) => `rgba(34, 197, 94, ${opacity})`, 
     },
     {
-      data: [52, 80.2, 70.5, 87.3, 65.6, 55.8, 49.8, 45.6, 50.3],
+      data: [52, 49, 42, 56, 59, 67, 75, 82, 81],
       strokeWidth: 2,
       color: (opacity = 1) => `rgba(55, 65, 81, ${opacity})`, 
     },
   ],
-  legend: ["Solar Production Forecast", "Energy Usage Prediction"]
+  legend: ["Solar Production Forecastn (kWh)", "Energy Usage Prediction (kWh)"]
 };
 
 const efficiencyData = {

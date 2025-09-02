@@ -1,26 +1,14 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  ScrollView,
-  TouchableOpacity,
-} from 'react-native';
-import { Zap, Menu } from 'lucide-react-native';
+import {View, Text, StyleSheet, Image, ScrollView} from 'react-native';
+import { Zap } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
+import DropdownMenu from '../components/DropdownMenu';
 
 export default function LandingScreen() {
-  const navigation = useNavigation<any>();
-  const [menuVisible, setMenuVisible] = useState(false);
-
-  const toggleMenu = () => {
-    setMenuVisible((prev) => !prev);
-  };
+  const navigation = useNavigation();
 
   const navigateTo = (screen: string) => {
-    setMenuVisible(false);
-    navigation.navigate(screen);
+    navigation.navigate(screen as never);
   };
 
   return (
@@ -31,29 +19,8 @@ export default function LandingScreen() {
           <View style={styles.iconBox}>
             <Zap color="white" size={28} />
           </View>
-          <TouchableOpacity onPress={toggleMenu}>
-            <Menu color="#333" size={28} />
-          </TouchableOpacity>
-
-          {/* Dropdown Navi */}
-          {menuVisible && (
-            <View style={styles.dropdownContainer}>
-              <TouchableOpacity onPress={() => navigateTo('Home')}>
-                <Text style={styles.menuItem}>Home</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => navigateTo('Login')}>
-                <Text style={styles.menuItem}>Login</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => navigateTo('Register')}>
-                <Text style={styles.menuItem}>Register</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => navigateTo('Contact')}>
-                <Text style={styles.menuItem}>Contact Us</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        </View>
-        
+        <DropdownMenu triggerType="icon" navigateTo={navigateTo} />
+        </View>   
 
         <Text style={styles.title}>CREDiT Digi Solution</Text>
         <Text style={styles.subtitle}>

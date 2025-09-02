@@ -11,6 +11,9 @@ import HistoryScreen from './screens/HistoryScreen';
 import SettingsScreen from './screens/SettingsScreen';
 import AccountScreen from './screens/AccountScreen';
 import ControlScreen from './screens/ControlScreen';
+import FinanceScreen from './screens/FinanceScreen';
+import FaultScreen from './screens/FaultScreen';
+import UserScreen from './screens/UserScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -28,6 +31,9 @@ export default function App() {
         <Stack.Screen name="Settings" component={SettingsScreen} />
         <Stack.Screen name="Account" component={AccountScreen} />
         <Stack.Screen name="Control" component={ControlScreen} />
+        <Stack.Screen name="Finance" component={FinanceScreen} />
+        <Stack.Screen name="Fault" component={FaultScreen} />
+        <Stack.Screen name="User" component={UserScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
