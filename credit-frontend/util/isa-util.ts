@@ -1,6 +1,8 @@
 // Fetch requests for ISA data
 
-const API_BASE_URL = "http://localhost:5000";
+import Constants from 'expo-constants';
+
+const API_BASE_URL: string = Constants.expoConfig?.extra?.apiUrl ?? 'http://localhost:5000';
 
 export async function getRequest(endpoint: string) {
   const response = await fetch(`${API_BASE_URL}${endpoint}`);
