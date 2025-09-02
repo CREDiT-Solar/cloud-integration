@@ -37,15 +37,15 @@ export default function FinanceScreen() {
             />
           </View>
           <FinanceRow
-            label="Initial PV Estimation"
+            label="Finance"
             description=""
           />
           <FinanceRow
-            label="real-time Estimation"
+            label="Finance"
             description=""
           />
           <FinanceRow
-            label="User Profile"
+            label="Finance"
             description=""
           />
         </View>

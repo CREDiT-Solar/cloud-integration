@@ -36,11 +36,11 @@ export default function UserScreen() {
             />
           </View>
           <UserRow
-            label="Initial PV Estimation"
+            label="User Profile"
             description=""
           />
           <UserRow
-            label="real-time Estimation"
+            label="User Profile"
             description=""
           />
           <UserRow

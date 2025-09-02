@@ -1,16 +1,5 @@
 import React, { useState } from "react";
-import {
-  SafeAreaView,
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Modal,
-  TextInput,
-  Button,
-  Alert,
-} from "react-native";
+import {  SafeAreaView, View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Modal, Button, Alert, } from "react-native";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { ChevronRight } from "lucide-react-native";
