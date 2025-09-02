@@ -143,6 +143,47 @@ export default function ControlScreen() {
     }
   };
 
+  const renderSliderTemp = () => {
+    if (Platform.OS === "web") {
+      return (
+        <input
+          type="range"
+          min={10}
+          max={100}
+          step={1}
+          value={String(tempTemp)}
+          onChange={(e: any) => {
+            const v = Number(e.target.value);
+            if (!Number.isNaN(v)) setTempTemp(v);
+          }}
+          onInput={(e: any) => {
+            const v = Number(e.currentTarget.value);
+            if (!Number.isNaN(v)) setTempTemp(v);
+          }}
+          style={{
+            width: 280,
+            accentColor: "#22c55e",
+          }}
+        />
+      );
+    } else {
+
+      return (
+        <Slider
+          style={{ width: 280, height: 40 }}
+          minimumValue={10}
+          maximumValue={100}
+          step={1}
+          value={tempTemp}
+          onValueChange={(value) => setTempTemp(value)}
+          onSlidingComplete={(value) => setTempTemp(value)}
+          minimumTrackTintColor="#22c55e"
+          maximumTrackTintColor="#ccc"
+        />
+      );
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
@@ -318,17 +359,8 @@ export default function ControlScreen() {
             {modalType === "temp" && (
               <>
                 <Text style={styles.modalTitle}>Temperature Protection</Text>
-                <Slider
-                  style={{ width: 250, height: 40 }}
-                  minimumValue={10}
-                  maximumValue={50}
-                  step={1}
-                  value={tempTemp}
-                  onValueChange={setTempTemp}
-                  minimumTrackTintColor="#22c55e"
-                  maximumTrackTintColor="#ccc"
-                />
-                <Text>{tempTemp}℃</Text>
+                {renderSliderTemp()}
+                <Text style={{ marginTop: 8, marginBottom: 4 }}>{tempTemp}%</Text>
               </>
             )}
 
