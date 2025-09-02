@@ -4,9 +4,15 @@ import { Picker } from "@react-native-picker/picker";
 import Title from "../components/Title";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { useNavigation } from '@react-navigation/native';
+import DropdownMenu from '../components/DropdownMenu';
 
 export default function SettingsScreen() {
   const [theme, setTheme] = useState("Light");
+  const navigation = useNavigation();
+  const navigateTo = (screen: string) => {
+    navigation.navigate(screen as never);
+  };
   
   // Notifications
   const [pushNotifications, setPushNotifications] = useState(true);
@@ -37,8 +43,11 @@ export default function SettingsScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.content}>
-          <Title title="Settings" subtitle="Customise your Solar Energy System experience" />
-
+        <View style={styles.titleRow}>
+        <Title title="Settings" subtitle="Customise your Solar Energy System experience" />
+        <DropdownMenu triggerType="icon" navigateTo={navigateTo} />
+        </View>
+          
           {/* Appearance */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Appearance</Text>
@@ -179,6 +188,14 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flex: 1,
+  },
+  titleRow: {
+    position: 'relative',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+    zIndex: 200, 
   },
   content: {
     flex: 1,

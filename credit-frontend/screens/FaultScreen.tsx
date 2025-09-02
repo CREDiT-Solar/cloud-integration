@@ -2,12 +2,19 @@ import React, { useState, useCallback } from "react";
 import {  SafeAreaView, View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Modal, Platform } from "react-native";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import Title from "../components/Title";
 import Slider from "@react-native-community/slider";
 import { ChevronRight } from "lucide-react-native";
+import { useNavigation } from '@react-navigation/native';
+import DropdownMenu from '../components/DropdownMenu';
 
 type FaultStatus = "ok" | "fault";
 
 export default function FaultScreen() {
+  const navigation = useNavigation();
+  const navigateTo = (screen: string) => {
+    navigation.navigate(screen as never);
+  };
   const [enable, setEnable] = useState(true);
 
   const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -92,7 +99,10 @@ export default function FaultScreen() {
         contentContainerStyle={{ paddingBottom: 80 }}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.pageTitle}>Fault Monitoring</Text>
+        <View style={styles.titleRow}>
+        <Title title="Fault Monitoring" subtitle="" />
+        <DropdownMenu triggerType="icon" navigateTo={navigateTo} />
+        </View>
 
         {/* Control card */}
         <View style={styles.card}>
@@ -255,6 +265,14 @@ const styles = StyleSheet.create({
   header: {},
   scrollContent: { flex: 1, paddingHorizontal: 16 },
   pageTitle: { fontSize: 18, fontWeight: "bold", marginVertical: 12 },
+  titleRow: {
+    position: 'relative',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+    zIndex: 200, 
+  },
   card: {
     backgroundColor: "#fff",
     borderRadius: 8,

@@ -2,12 +2,20 @@ import React, { useState } from "react";
 import {  SafeAreaView, View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Modal, Pressable, Platform } from "react-native";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import Title from "../components/Title";
 import { Picker } from "@react-native-picker/picker";
 import { ChevronRight } from "lucide-react-native";
 import Slider from "@react-native-community/slider";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { useNavigation } from '@react-navigation/native';
+import DropdownMenu from '../components/DropdownMenu';
 
 export default function ControlScreen() {
+  const navigation = useNavigation();
+  const navigateTo = (screen: string) => {
+    navigation.navigate(screen as never);
+  };
+
   const [selectedBattery, setSelectedBattery] = useState("Battery 1");
 
   const [modalVisible, setModalVisible] = useState(false);
@@ -188,7 +196,7 @@ export default function ControlScreen() {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Header userName="Admin" />
+        <Header userName="Site Manager" />
       </View>
 
       {/* Main ScrollView */}
@@ -197,8 +205,10 @@ export default function ControlScreen() {
         contentContainerStyle={{ paddingBottom: 80 }}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.pageTitle}>System Control</Text>
-        <Text style={styles.subTitle}>System control for Admin</Text>
+        <View style={styles.titleRow}>
+        <Title title="Digi Control Hub" subtitle="System control for Site Manager" />
+        <DropdownMenu triggerType="icon" navigateTo={navigateTo} />
+        </View>
 
         {/* Battery Setting Panel */}
         <View style={styles.card}>
@@ -432,6 +442,14 @@ const styles = StyleSheet.create({
     fontSize: 14, 
     color: "#6b7280", 
     marginBottom: 12 
+  },
+  titleRow: {
+    position: 'relative',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+    zIndex: 200, 
   },
   card: {
     backgroundColor: "#fff",

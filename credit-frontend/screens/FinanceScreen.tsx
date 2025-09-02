@@ -1,9 +1,16 @@
-import React, { useState } from "react";
+import React,{ useState } from "react";
 import { SafeAreaView, View, Text, StyleSheet, ScrollView, Switch } from "react-native";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import Title from "../components/Title";
+import { useNavigation } from '@react-navigation/native';
+import DropdownMenu from '../components/DropdownMenu';
 
 export default function FinanceScreen() {
+  const navigation = useNavigation();
+  const navigateTo = (screen: string) => {
+    navigation.navigate(screen as never);
+  };
   const [enable, setEnable] = useState(true);
 
   return (
@@ -19,34 +26,43 @@ export default function FinanceScreen() {
         contentContainerStyle={{ paddingBottom: 80 }}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.pageTitle}>Energy as a Service (EaaS)</Text>
+        <View style={styles.titleRow}>
+        <Title title="Energy as a Service (EaaS)" subtitle="" />
+        <DropdownMenu triggerType="icon" navigateTo={navigateTo} />
+        </View>
 
-        {/* Finance Section */}
+        {/* Control card */}
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>Finance</Text>
-
-          <View style={styles.row}>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.rowLabel}>Enable/Disable</Text>
-            </View>
+          <Text style={styles.cardTitle}>System Monitoring Control</Text>
+          <View style={[styles.row, styles.toggleRow]}>
+            <Text style={[styles.rowLabel, { flex: 1 }]}>Enable/Disable</Text>
             <Switch
               value={enable}
               onValueChange={setEnable}
               trackColor={{ false: "#ccc", true: "#22c55e" }}
               thumbColor={"#fff"}
+              style={{ marginLeft: "auto" }}
             />
           </View>
+        </View>
+
+        <View style={styles.card}>
           <FinanceRow
-            label="Finance"
-            description=""
+            label="Initial PV Estimation"
+            description="Initial PV cost estimation"
           />
           <FinanceRow
-            label="Finance"
-            description=""
+            label="Real-time Estimation"
+            description="Real-time estimation of current energy costs."
           />
           <FinanceRow
-            label="Finance"
-            description=""
+            label="User Profile"
+            description="Detailed user-related financial information and energy usage."
+            subItems={[
+              "ID: 123456",
+              "Energy as a User: 150 kWh",
+              "Cost: £245.00",
+            ]}
           />
         </View>
       </ScrollView>
@@ -55,7 +71,6 @@ export default function FinanceScreen() {
       <View style={styles.footer}>
         <Footer currentPage="Finance" />
       </View>
-
     </SafeAreaView>
   );
 }
@@ -64,22 +79,38 @@ type RowProps = {
   label: string;
   description?: string;
   onPress?: () => void;
+  subItems?: string[];
 };
 
-const FinanceRow = ({ label, description }: RowProps) => (
+const FinanceRow = ({ label, description, subItems }: RowProps) => (
   <View style={styles.row}>
     <View style={{ flex: 1 }}>
       <Text style={styles.rowLabel}>{label}</Text>
       {description && <Text style={styles.rowDescription}>{description}</Text>}
+      {subItems &&
+        subItems.map((item, index) => (
+          <Text key={index} style={styles.subItem}>
+            • {item}
+          </Text>
+        ))}
     </View>
   </View>
 );
+
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff" },
   header: {},
   scrollContent: { flex: 1, paddingHorizontal: 16 },
   pageTitle: { fontSize: 18, fontWeight: "bold", marginVertical: 12 },
+  titleRow: {
+    position: 'relative',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+    zIndex: 200, 
+  },
   card: {
     backgroundColor: "#fff",
     borderRadius: 8,
@@ -98,36 +129,10 @@ const styles = StyleSheet.create({
   },
   rowLabel: { fontSize: 14, fontWeight: "500", color: "#111" },
   rowDescription: { fontSize: 12, color: "#6b7280" },
-  footer: {},
-  // Modal
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.4)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContent: {
-    width: "85%",
-    backgroundColor: "#fff",
-    padding: 20,
-    borderRadius: 12,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 12,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 16,
-  },
-  modalButtons: {
-    flexDirection: "row",
+  subItem: { fontSize: 12, color: "#0d0d0eff", marginLeft: 10, marginTop: 2 },
+  toggleRow: {
     justifyContent: "space-between",
-    marginTop: 20,
   },
+  footer: {},
 });
 

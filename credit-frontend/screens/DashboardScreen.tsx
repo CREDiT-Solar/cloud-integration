@@ -10,6 +10,8 @@ import CardChart from "../components/CardChart";
 import BarchartComponent from '../components/BarChart';
 import LineChartComponent, { LineChartData } from "../components/LineChart";
 import { getRequest } from "../util/isa-util";
+import { useNavigation } from '@react-navigation/native';
+import DropdownMenu from '../components/DropdownMenu';
 
 const lineChartData: LineChartData = {
   labels: ["9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"],
@@ -37,6 +39,11 @@ const efficiencyData = {
 };
 
 export default function HistoryScreen() {
+    const navigation = useNavigation();
+    const navigateTo = (screen: string) => {
+      navigation.navigate(screen as never);
+    };
+
     const [carbonEmissions, setCarbonEmissions] = useState<number | null>(null);
     // Inverter 1
     const [inverterPower, setInverterPower] = useState<number | null>(null);
@@ -287,8 +294,10 @@ export default function HistoryScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.content}>
+        <View style={styles.titleRow}>
           <Title title="Real-Time Dashboard" subtitle="Live monitoring of your solar energy system" />
-
+          <DropdownMenu triggerType="icon" navigateTo={navigateTo} />
+        </View>
           <CardReadout 
             title="Cardon Emissions" 
             value={carbonEmissions !== null ? carbonEmissions.toFixed(2) : "--"} 
@@ -365,9 +374,7 @@ export default function HistoryScreen() {
                 <BarchartComponent data={efficiencyData} width={640} height={280} />
               </CardChart>
             </View>
-
           </View>
-        
         </View>
       </ScrollView>
 
@@ -390,6 +397,14 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flex: 1,
+  },
+  titleRow: {
+    position: 'relative',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+    zIndex: 200, 
   },
   content: {
     flex: 1,

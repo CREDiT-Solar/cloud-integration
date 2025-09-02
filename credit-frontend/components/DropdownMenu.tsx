@@ -44,7 +44,7 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({
       {/* Dropdown menu */}
       {menuVisible && (
         <View style={styles.dropdownContainer}>
-          {['Home', 'Login', 'Register', 'Contact Us'].map((label) => (
+          {['Home', 'Login', 'Register', 'Contact'].map((label) => (
             <TouchableOpacity key={label} onPress={() => navigateTo(label)}>
               <Text style={styles.menuItem} numberOfLines={1}>{label}</Text>
             </TouchableOpacity>

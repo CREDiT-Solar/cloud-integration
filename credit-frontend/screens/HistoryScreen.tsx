@@ -9,6 +9,8 @@ import LineChartComponent, { LineChartData } from "../components/LineChart";
 import CardReadout from "../components/CardReadout";
 import { Calendar, RefreshCcw, TrendingUp } from "lucide-react-native";
 import { getRequest, postRequest } from '../util/isa-util';
+import { useNavigation } from '@react-navigation/native';
+import DropdownMenu from '../components/DropdownMenu';
 
 type PeriodType = "day" | "week" | "month" | "year";
 
@@ -177,6 +179,11 @@ export default function HistoryScreen() {
   const [SolarProd, setSolarProd] = useState<number | null>(null);
   const [lineChartData, setLineChartData] = useState<LineChartData | null>(null);
 
+  const navigation = useNavigation();
+  const navigateTo = (screen: string) => {
+    navigation.navigate(screen as never);
+  };
+
   //  useEffect(() => {
   //     // solar production today
   //     async function fetchSolarToday() {
@@ -242,8 +249,11 @@ export default function HistoryScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.content}>
+        <View style={styles.titleRow}>
           <Title title="History & Analytics" subtitle="Analyse your solar system performance over time" />
-
+          <DropdownMenu triggerType="icon" navigateTo={navigateTo} />
+        </View>
+          
           <View style={styles.row}>
             <CardReadout title="Total PV Production" value="623" units="kWh" subtitle="+12% vs last month" icon={<Calendar size={38} color="#22c55e" />} />
             <CardReadout title="Grid" value="224" units="kWh" subtitle="+10% vs last month" icon={<Image source={require("../assets/grid.png")} style={{ width: 38, height: 38 }} resizeMode="contain"/>} />
@@ -301,6 +311,14 @@ const styles = StyleSheet.create({
   header: {},
   scrollContent: {
     flex: 1,
+  },
+  titleRow: {
+    position: 'relative',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+    zIndex: 200, 
   },
   content: {
     flex: 1,

@@ -5,7 +5,7 @@ import LandingScreen from './screens/LandingScreen';
 import HomeScreen from './screens/HomeScreen';
 import LoginScreen from './screens/LoginScreen';
 import RegisterScreen from './screens/RegisterScreen'
-import ContactScreen from './screens/ContactScreen'
+import ContactScreen from './screens/ContactScreen';
 import DashboardScreen from './screens/DashboardScreen';
 import HistoryScreen from './screens/HistoryScreen';
 import SettingsScreen from './screens/SettingsScreen';
@@ -15,7 +15,23 @@ import FinanceScreen from './screens/FinanceScreen';
 import FaultScreen from './screens/FaultScreen';
 import UserScreen from './screens/UserScreen';
 
-const Stack = createNativeStackNavigator();
+export type RootStackParamList = {
+  Login: undefined;
+  Register: undefined;
+  Landing: undefined;
+  Contact: undefined;
+  Home: undefined;
+  Dashboard: undefined;
+  History: undefined;
+  Settings: undefined;
+  Account: undefined;
+  Control: undefined;
+  Finance: undefined;
+  Fault: undefined;
+  User: undefined;
+};
+
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
   return (
