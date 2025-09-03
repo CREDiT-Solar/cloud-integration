@@ -10,8 +10,7 @@ export async function getRequest(endpoint: string) {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      "ngrok-skip-browser-warning": "123",
-      Origin: window.location.origin,
+      "ngrok-skip-browser-warning": "true",
     }
   });
   console.log(await response.json())
@@ -26,7 +25,7 @@ export async function postRequest(endpoint: string, args: any) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      "ngrok-skip-browser-warning": "123",
+      "ngrok-skip-browser-warning": "true",
     },
     body: JSON.stringify(args),
   });

@@ -59,7 +59,7 @@ export default function HomeScreen() {
         console.error("Error fetching battery SOC:", err);
       }
     }
-    fetchBatterySoc();
+    // fetchBatterySoc();
 
     // Current load
     async function fetchCurrentLoad() {
@@ -75,7 +75,7 @@ export default function HomeScreen() {
         console.error("Error fetching current load:", err);
       }
     }
-    fetchCurrentLoad();
+    // fetchCurrentLoad();
 
     // Day solar production for line chart
     async function fetchDaySolarProd() {
@@ -115,7 +115,7 @@ export default function HomeScreen() {
         console.error("Error fetching historical solar production:", err);
       }
     }
-    fetchDaySolarProd();
+    // fetchDaySolarProd();
   }, []);
 
   return (
