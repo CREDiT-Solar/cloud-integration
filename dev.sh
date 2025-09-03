@@ -9,7 +9,7 @@ command -v jq >/dev/null 2>&1 || { echo "Error: jq is not installed. Install it 
 command -v python3 >/dev/null 2>&1 || { echo "Error: python3 is not installed." >&2; exit 1; }
 command -v npx >/dev/null 2>&1 || { echo "Error: npx (Node.js) is not installed." >&2; exit 1; }
 
-VENV_PATH="./.venv"
+VENV_PATH=".venv"
 
 if [[ -z "$VIRTUAL_ENV" ]]; then
   if [[ ! -d "$VENV_PATH" ]]; then
@@ -30,7 +30,7 @@ fi
 python3 aws-backend/isa-api/isa-api.py &
 FLASK_PID=$!
 
-ngrok http 5000 > /dev/null &
+ngrok http 5000 --response-header-add "Access-Control-Allow-Origin: *" > /dev/null &
 NGROK_PID=$!
 
 sleep 2

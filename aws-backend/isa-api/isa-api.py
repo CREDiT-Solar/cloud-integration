@@ -8,6 +8,15 @@ import random
 import pymysql
 from queue import Queue
 
+app = Flask(__name__)
+CORS(
+    app,
+    resources={r"/*": {"origins": "*"}},
+    methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization"]
+)
+
+
 SSH_CONFIG = {
     "ssh_host": "isapc7.york.ac.uk",
     "ssh_port": 22,
@@ -36,10 +45,7 @@ for _ in range(POOL_SIZE):
         cursorclass=pymysql.cursors.DictCursor,
     )
     DB_POOL.put(conn)
-
-app = Flask(__name__)
-CORS(app)
-
+    
 # Battery constants
 BATTERY_MIN_VOLTAGE = 5.0
 BATTERY_MAX_VOLTAGE = 18.0
