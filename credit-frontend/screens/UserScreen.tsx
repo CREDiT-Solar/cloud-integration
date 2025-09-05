@@ -1,10 +1,18 @@
 import React, { useState } from "react";
-import { SafeAreaView, View, Text, StyleSheet, ScrollView, Switch } from "react-native";
+import { SafeAreaView, View, Text, StyleSheet, ScrollView, TextInput } from "react-native";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import Title from "../components/Title";
+import { useNavigation } from '@react-navigation/native';
+import DropdownMenu from '../components/DropdownMenu';
 
 export default function UserScreen() {
-  const [enable, setEnable] = useState(true);
+  const [userId, setUserId] = useState("");
+
+  const navigation = useNavigation();
+  const navigateTo = (screen: string) => {
+    navigation.navigate(screen as never);
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -19,33 +27,41 @@ export default function UserScreen() {
         contentContainerStyle={{ paddingBottom: 80 }}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.pageTitle}>User</Text>
+        <View style={styles.titleRow}>
+        <Title title="User Dashboard" subtitle="" />
+        <DropdownMenu triggerType="icon" navigateTo={navigateTo} />
+        </View>
 
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>User</Text>
+          {/* <Text style={styles.cardTitle}>User ID</Text> */}
 
           <View style={styles.row}>
             <View style={{ flex: 1 }}>
-              <Text style={styles.rowLabel}>Enable/Disable</Text>
+              <Text style={styles.rowLabel}>User ID</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter your user ID"
+                value={userId}
+                onChangeText={setUserId}
+              />
             </View>
-            <Switch
-              value={enable}
-              onValueChange={setEnable}
-              trackColor={{ false: "#ccc", true: "#22c55e" }}
-              thumbColor={"#fff"}
-            />
           </View>
+
           <UserRow
-            label="Initial PV Estimation"
-            description=""
+            label="Consumption"
+            description="Total energy consumption today"
           />
           <UserRow
-            label="real-time Estimation"
-            description=""
+            label="Cost of Consumption"
+            description="Total cost of consumption today"
           />
           <UserRow
-            label="User Profile"
-            description=""
+            label="Availability during day"
+            description="Energy availability estimation"
+          />
+          <UserRow
+            label="Prediction Energy"
+            description="For the next day"
           />
         </View>
       </ScrollView>
@@ -54,7 +70,6 @@ export default function UserScreen() {
       <View style={styles.footer}>
         <Footer currentPage="User" />
       </View>
-
     </SafeAreaView>
   );
 }
@@ -98,35 +113,50 @@ const styles = StyleSheet.create({
   rowLabel: { fontSize: 14, fontWeight: "500", color: "#111" },
   rowDescription: { fontSize: 12, color: "#6b7280" },
   footer: {},
-  // Modal
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.4)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContent: {
-    width: "85%",
-    backgroundColor: "#fff",
-    padding: 20,
-    borderRadius: 12,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 12,
-  },
   input: {
     borderWidth: 1,
     borderColor: "#ddd",
     borderRadius: 8,
     padding: 10,
-    marginBottom: 16,
+    marginTop: 4,
   },
-  modalButtons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 20,
+  titleRow: {
+    position: 'relative',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+    zIndex: 200, 
+  },
+  iconBox: {
+    backgroundColor: '#16A34A',
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  dropdownContainer: {
+    position: 'absolute',
+    top: 56,
+    right: 0,
+    backgroundColor: '#ffffff',   
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    zIndex: 999,                  
+    elevation: 16,             
+    shadowColor: '#000',
+    shadowOpacity: 0.15,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 2 },
+  },
+  menuItem: {
+    paddingVertical: 8,
+    fontSize: 16,
+    color: '#333',
   },
 });
 

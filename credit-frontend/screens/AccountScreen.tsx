@@ -1,21 +1,17 @@
 import React, { useState } from "react";
-import {
-  SafeAreaView,
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Modal,
-  TextInput,
-  Button,
-  Alert,
-} from "react-native";
+import {  SafeAreaView, View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Modal, Button, Alert, } from "react-native";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { ChevronRight } from "lucide-react-native";
+import { useNavigation } from '@react-navigation/native';
+import DropdownMenu from '../components/DropdownMenu';
 
 export default function AccountScreen() {
+  const navigation = useNavigation();
+  const navigateTo = (screen: string) => {
+    navigation.navigate(screen as never);
+  };
+
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState<string | null>(null);
 
@@ -105,7 +101,10 @@ const handleCancel = () => {
         contentContainerStyle={{ paddingBottom: 80 }}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.pageTitle}>User Page</Text>
+        <View style={styles.titleRow}>
+        <Text style={styles.pageTitle}>Account Page</Text>
+        <DropdownMenu triggerType="icon" navigateTo={navigateTo} />
+        </View>
 
         {/* Manage Account Section */}
         <View style={styles.card}>
@@ -255,6 +254,14 @@ const styles = StyleSheet.create({
   header: {},
   scrollContent: { flex: 1, paddingHorizontal: 16 },
   pageTitle: { fontSize: 18, fontWeight: "bold", marginVertical: 12 },
+  titleRow: {
+    position: 'relative',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+    zIndex: 200, 
+  },
   card: {
     backgroundColor: "#fff",
     borderRadius: 8,

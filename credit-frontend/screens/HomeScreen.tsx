@@ -9,6 +9,8 @@ import LineChartComponent, { LineChartData } from '../components/LineChart';
 import CardChart from '../components/CardChart';
 import { Zap, Battery, Home } from 'lucide-react-native';
 import { getRequest, postRequest } from '../util/isa-util';
+import { useNavigation } from '@react-navigation/native';
+import DropdownMenu from '../components/DropdownMenu';
 
 const pieData: PieDataItem[] = [
   { name: "Solar", population: 35, color: "#22c55e", legendFontColor: "#111", legendFontSize: 12 },
@@ -23,6 +25,11 @@ interface DaySolarProd {
 }
 
 export default function HomeScreen() {
+  const navigation = useNavigation()
+  const navigateTo = (screen: string) => {
+    navigation.navigate(screen as never);
+  };
+
   const [solarProd, setSolarProd] = useState<number | null>(null);
   const [batterySOC, setBatterySOC] = useState<number | null>(null);
   const [energyUsage, setEnergyUsage] = useState<number | null>(null);
@@ -132,7 +139,11 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.content}>
+          
+          <View style={styles.titleRow}>
           <Title title="System Overview" subtitle="Monitor your solar energy performance" />
+          <DropdownMenu triggerType="icon" navigateTo={navigateTo} />
+          </View>
 
           <View style={styles.row}>
             <CardReadout
@@ -200,6 +211,14 @@ const styles = StyleSheet.create({
     width: "100%",
     justifyContent: "flex-start",
     paddingHorizontal: 16,
+  },
+  titleRow: {
+    position: 'relative',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+    zIndex: 200, 
   },
   row: {
     flexDirection: "row",

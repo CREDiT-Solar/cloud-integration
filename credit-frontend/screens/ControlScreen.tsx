@@ -2,15 +2,21 @@ import React, { useState } from "react";
 import {  SafeAreaView, View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Modal, Pressable, Platform } from "react-native";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import Title from "../components/Title";
 import { Picker } from "@react-native-picker/picker";
 import { ChevronRight } from "lucide-react-native";
 import Slider from "@react-native-community/slider";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { useNavigation } from '@react-navigation/native';
+import DropdownMenu from '../components/DropdownMenu';
 
 export default function ControlScreen() {
+  const navigation = useNavigation();
+  const navigateTo = (screen: string) => {
+    navigation.navigate(screen as never);
+  };
+
   const [selectedBattery, setSelectedBattery] = useState("Battery 1");
-  const [solarInverter, setSolarInverter] = useState(true);
-  const [batteryInverter, setBatteryInverter] = useState(true);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState<string>("");
@@ -32,7 +38,6 @@ export default function ControlScreen() {
 
   const openDialog = (type: string) => {
     setModalType(type);
-
     setTempSoc(socLevel);
     setTempChargeMode(chargeMode);
     setTempStartTime(startTime);
@@ -105,11 +110,93 @@ export default function ControlScreen() {
     );
   };
 
+  const renderSlider = () => {
+    if (Platform.OS === "web") {
+      return (
+        <input
+          type="range"
+          min={10}
+          max={100}
+          step={1}
+          value={String(tempSoc)}
+          onChange={(e: any) => {
+            const v = Number(e.target.value);
+            if (!Number.isNaN(v)) setTempSoc(v);
+          }}
+          onInput={(e: any) => {
+            const v = Number(e.currentTarget.value);
+            if (!Number.isNaN(v)) setTempSoc(v);
+          }}
+          style={{
+            width: 280,
+            accentColor: "#22c55e",
+          }}
+        />
+      );
+    } else {
+
+      return (
+        <Slider
+          style={{ width: 280, height: 40 }}
+          minimumValue={10}
+          maximumValue={100}
+          step={1}
+          value={tempSoc}
+          onValueChange={(value) => setTempSoc(value)}
+          onSlidingComplete={(value) => setTempSoc(value)}
+          minimumTrackTintColor="#22c55e"
+          maximumTrackTintColor="#ccc"
+        />
+      );
+    }
+  };
+
+  const renderSliderTemp = () => {
+    if (Platform.OS === "web") {
+      return (
+        <input
+          type="range"
+          min={10}
+          max={100}
+          step={1}
+          value={String(tempTemp)}
+          onChange={(e: any) => {
+            const v = Number(e.target.value);
+            if (!Number.isNaN(v)) setTempTemp(v);
+          }}
+          onInput={(e: any) => {
+            const v = Number(e.currentTarget.value);
+            if (!Number.isNaN(v)) setTempTemp(v);
+          }}
+          style={{
+            width: 280,
+            accentColor: "#22c55e",
+          }}
+        />
+      );
+    } else {
+
+      return (
+        <Slider
+          style={{ width: 280, height: 40 }}
+          minimumValue={10}
+          maximumValue={100}
+          step={1}
+          value={tempTemp}
+          onValueChange={(value) => setTempTemp(value)}
+          onSlidingComplete={(value) => setTempTemp(value)}
+          minimumTrackTintColor="#22c55e"
+          maximumTrackTintColor="#ccc"
+        />
+      );
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Header userName="Admin" />
+        <Header userName="Site Manager" />
       </View>
 
       {/* Main ScrollView */}
@@ -118,8 +205,10 @@ export default function ControlScreen() {
         contentContainerStyle={{ paddingBottom: 80 }}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.pageTitle}>System Control</Text>
-        <Text style={styles.subTitle}>System control for Admin</Text>
+        <View style={styles.titleRow}>
+        <Title title="Digi Control Hub" subtitle="System control for Site Manager" />
+        <DropdownMenu triggerType="icon" navigateTo={navigateTo} />
+        </View>
 
         {/* Battery Setting Panel */}
         <View style={styles.card}>
@@ -151,7 +240,7 @@ export default function ControlScreen() {
           />
           <ControlRow
             label="Charging/Discharging"
-            description="Control charging/discharging"
+            description={`Current mode: ${chargeMode}`}
             onPress={() => openDialog("charge")}
           />
           <ControlRow
@@ -166,44 +255,44 @@ export default function ControlScreen() {
           />
         </View>
 
-        {/* Device Control Panel */}
+        {/* Device Panel */}
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>Device Control Panel</Text>
+          <Text style={styles.cardTitle}>Battery Overview</Text>
 
-          {/* Solar Inverter */}
           <View style={styles.row}>
             <View style={{ flex: 1 }}>
-              <Text style={styles.rowLabel}>Solar Inverter</Text>
-              <Text style={styles.rowDescription}>Turn on/off</Text>
+              <Text style={styles.rowLabel}>PV Yield</Text>
+              <Text style={styles.rowDescription}>For the battery</Text>
             </View>
-            <Switch
-              value={solarInverter}
-              onValueChange={setSolarInverter}
-              trackColor={{ false: "#ccc", true: "#22c55e" }}
-              thumbColor={"#fff"}
-            />
           </View>
 
-          {/* Battery Inverter */}
           <View style={styles.row}>
             <View style={{ flex: 1 }}>
-              <Text style={styles.rowLabel}>Battery Inverter</Text>
-              <Text style={styles.rowDescription}>Turn on/off</Text>
+              <Text style={styles.rowLabel}>Historical Data</Text>
+              <Text style={styles.rowDescription}>Historical data of the battery</Text>
             </View>
-            <Switch
-              value={batteryInverter}
-              onValueChange={setBatteryInverter}
-              trackColor={{ false: "#ccc", true: "#22c55e" }}
-              thumbColor={"#fff"}
-            />
+          </View>
+
+          <View style={styles.row}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.rowLabel}>Estimation Data</Text>
+              <Text style={styles.rowDescription}>For realistic scenario</Text>
+            </View>
+          </View>
+
+          <View style={styles.row}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.rowLabel}>User profile</Text>
+              <Text style={styles.rowDescription}>For site managers</Text>
+            </View>
           </View>
 
           {/* Smart Load Control */}
-          <ControlRow
+          {/* <ControlRow
             label="Smart Load Control"
             description="Control or automate the use of electrical devices"
             onPress={() => openDialog("load")}
-          />
+          /> */}
         </View>
       </ScrollView>
 
@@ -212,24 +301,15 @@ export default function ControlScreen() {
         <Footer currentPage="Control" />
       </View>
 
-      {/* Modal with Custom UI */}
+      {/* SoC Modal */}
       <Modal transparent={true} visible={modalVisible} animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.modalBox}>
             {modalType === "soc" && (
               <>
                 <Text style={styles.modalTitle}>Battery SOC Setting</Text>
-                <Slider
-                  style={{ width: 250, height: 40 }}
-                  minimumValue={20}
-                  maximumValue={90}
-                  step={1}
-                  value={tempSoc}
-                  onValueChange={setTempSoc}
-                  minimumTrackTintColor="#22c55e"
-                  maximumTrackTintColor="#ccc"
-                />
-                <Text>{tempSoc}%</Text>
+                {renderSlider()}
+                <Text style={{ marginTop: 8, marginBottom: 4 }}>{tempSoc}%</Text>
               </>
             )}
 
@@ -243,7 +323,7 @@ export default function ControlScreen() {
                   ]}
                   onPress={() => setTempChargeMode("Charging")}
                 >
-                  <Text>Charging</Text>
+                <Text>Charging</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[
@@ -252,7 +332,7 @@ export default function ControlScreen() {
                   ]}
                   onPress={() => setTempChargeMode("Discharging")}
                 >
-                  <Text>Discharging</Text>
+                <Text>Discharging</Text>
                 </TouchableOpacity>
               </>
             )}
@@ -289,17 +369,8 @@ export default function ControlScreen() {
             {modalType === "temp" && (
               <>
                 <Text style={styles.modalTitle}>Temperature Protection</Text>
-                <Slider
-                  style={{ width: 250, height: 40 }}
-                  minimumValue={10}
-                  maximumValue={50}
-                  step={1}
-                  value={tempTemp}
-                  onValueChange={setTempTemp}
-                  minimumTrackTintColor="#22c55e"
-                  maximumTrackTintColor="#ccc"
-                />
-                <Text>{tempTemp}℃</Text>
+                {renderSliderTemp()}
+                <Text style={{ marginTop: 8, marginBottom: 4 }}>{tempTemp}%</Text>
               </>
             )}
 
@@ -318,15 +389,16 @@ export default function ControlScreen() {
             )}
 
             <View style={styles.modalButtonRow}>
+              <Pressable style={styles.modalButton} onPress={saveDialog}>
+                <Text style={styles.modalButtonText}>Save</Text>
+              </Pressable>
               <Pressable
                 style={[styles.modalButton, styles.cancelButton]}
                 onPress={cancelDialog}
               >
-                <Text style={styles.cancelButtonText}>Cancel</Text>
+              <Text style={styles.cancelButtonText}>Cancel</Text>
               </Pressable>
-              <Pressable style={styles.modalButton} onPress={saveDialog}>
-                <Text style={styles.modalButtonText}>Save</Text>
-              </Pressable>
+
             </View>
           </View>
         </View>
@@ -370,6 +442,14 @@ const styles = StyleSheet.create({
     fontSize: 14, 
     color: "#6b7280", 
     marginBottom: 12 
+  },
+  titleRow: {
+    position: 'relative',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+    zIndex: 200, 
   },
   card: {
     backgroundColor: "#fff",

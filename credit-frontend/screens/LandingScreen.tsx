@@ -6,7 +6,6 @@ import DropdownMenu from '../components/DropdownMenu';
 
 export default function LandingScreen() {
   const navigation = useNavigation();
-
   const navigateTo = (screen: string) => {
     navigation.navigate(screen as never);
   };
@@ -55,7 +54,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start', 
   },
   card: {
-    width: '65%',
+    width: '70%',
     backgroundColor: '#fff',
     borderRadius: 20,
     padding: 24,
@@ -122,7 +121,7 @@ const styles = StyleSheet.create({
     color: '#111',
     fontWeight: '500',
   },
-    partnersTitle: {
+  partnersTitle: {
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 12,
@@ -130,7 +129,7 @@ const styles = StyleSheet.create({
     alignSelf: "center", 
     marginTop: 30,
   },
-    logosContainer: {
+  logosContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
