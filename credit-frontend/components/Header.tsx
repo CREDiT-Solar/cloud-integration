@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Sun, Moon, Bell, CloudSun } from "lucide-react-native";
+import { getRequest } from "../util/isa-util";
 
 interface HeaderProps {
   userName?: string;
@@ -15,6 +16,26 @@ export default function Header({
     setIsDark((prev) => !prev);
   };
 
+  const [temperature, setTemperature] = useState<number | null>(null);
+
+  useEffect(() => {
+      // Weather  
+      async function fetchTemperature() {
+        try {
+          const data = await getRequest("/get_temperature");
+          console.log("Fetched data:", data);
+          // API Response example: [{ "latest_temperature": 21.2874 }]
+          if (Array.isArray(data) && data.length > 0 && typeof data[0] === 'object' && data[0] !== null) {
+            const value = data[0].latest_temperature;
+            setTemperature(value);
+          }
+        } catch (err) {
+          console.error("Error fetching temperature:", err);
+        }
+      }
+      fetchTemperature();
+  })
+
   return (
     <View style={[styles.container, isDark && styles.darkContainer]}>
       <View style={styles.leftBlock}>
@@ -24,7 +45,8 @@ export default function Header({
 
       <View style={styles.centerBlock}>
         <CloudSun color="#fbbf24" size={22} style={{ marginRight: 5 }} />
-        <Text style={[styles.weatherText, isDark && styles.darkText]}>Sunny, 30°C</Text>
+        {/* <Text style={[styles.weatherText, isDark && styles.darkText]}>Sunny, 30°C</Text> */}
+         <Text style={[styles.weatherText, isDark && styles.darkText]}>Sunny, {temperature !== null ? temperature.toFixed(2) : "--"} °C</Text>
       </View>
 
       <View style={styles.rightBlock}>
