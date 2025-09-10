@@ -3,7 +3,6 @@ import { View, Text, StyleSheet } from "react-native";
 
 export interface ReadoutProps {
   title: string;
-  // value: string | (() => string);
   value: string | number | (() => string | number);
   units?: string;
   subtitle?: string;

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Menu } from 'lucide-react-native';
+import { useAuth } from './AuthContext';
 
 type DropdownMenuProps = {
   triggerType?: 'icon' | 'text'; 
@@ -20,6 +21,8 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({
   const [internalVisible, setInternalVisible] = useState(false);
   const menuVisible = isVisible ?? internalVisible;
 
+  const { isLoggedIn, logout, userType } = useAuth();
+
   const toggleMenu = () => {
     if (onToggle) {
       onToggle();
@@ -27,6 +30,32 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({
       setInternalVisible((prev) => !prev);
     }
   };
+
+  const menuItems = isLoggedIn
+    ? ['Main', 'Home', 'Logout', 'Contact']
+    : ['Main', 'Login', 'Register', 'Contact'];
+
+  const handleMenuPress = (label: string) => {
+    if (label === 'Logout') {
+      logout();
+      navigateTo('Main');  
+    } else if (label === 'Home') {
+
+      if (userType === 'User') {
+        navigateTo('User');
+      } else if (userType === 'Finance Manager') {
+        navigateTo('Finance');
+      } else {
+        navigateTo('Home'); 
+      }
+
+    } else {
+      navigateTo(label);
+    }
+
+    setInternalVisible(false);
+  };
+
 
   return (
     <View style={styles.wrapper}>
@@ -44,9 +73,14 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({
       {/* Dropdown menu */}
       {menuVisible && (
         <View style={styles.dropdownContainer}>
-          {['Home', 'Login', 'Register', 'Contact'].map((label) => (
-            <TouchableOpacity key={label} onPress={() => navigateTo(label)}>
-              <Text style={styles.menuItem} numberOfLines={1}>{label}</Text>
+          {menuItems.map((label) => (
+            <TouchableOpacity
+              key={label}
+              onPress={() => handleMenuPress(label)}
+            >
+              <Text style={styles.menuItem} numberOfLines={1}>
+                {label}
+              </Text>
             </TouchableOpacity>
           ))}
         </View>

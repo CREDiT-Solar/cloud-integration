@@ -4,7 +4,7 @@ import { Zap } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import DropdownMenu from '../components/DropdownMenu';
 
-export default function LandingScreen() {
+export default function MainScreen() {
   const navigation = useNavigation();
   const navigateTo = (screen: string) => {
     navigation.navigate(screen as never);

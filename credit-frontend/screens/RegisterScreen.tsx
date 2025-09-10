@@ -13,7 +13,6 @@ export default function RegisterScreen() {
   const navigation = useNavigation();
 
   const handleRegister = () => {
-    // TODO: register logic
     console.log({ userType, email, username, password, confirmPassword });
   };
 
