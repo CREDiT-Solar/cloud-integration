@@ -33,7 +33,6 @@ export default function SettingsScreen() {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        {/* <Header userName="Guest" /> */}
         <Header />
       </View>
 
@@ -185,7 +184,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   header: {
-    // style for header
   },
   scrollContent: {
     flex: 1,
@@ -245,7 +243,6 @@ const styles = StyleSheet.create({
     textAlign: "center", 
   },
   footer: {
-    // style for footer
   },
 });
 

@@ -25,17 +25,4 @@ const styles = StyleSheet.create({
   units: { marginLeft: 4, color: "#6b7280" },
 });
 
-// const NameValueLine: React.FC<NameValueProps> = ({ title, value, units }) => {
-//     const displayValue = typeof value === "function" ? value() : value;
-//     return (
-//         <div>
-//             <div>
-//                 <h3>{title}</h3>
-//             </div>
-//             <div>{displayValue}</div>
-//             {units && <div>{units}</div>}
-//         </div>
-//     );
-// };
-
 export default NameValueLine;

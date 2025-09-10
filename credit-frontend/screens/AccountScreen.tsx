@@ -92,7 +92,6 @@ const handleCancel = () => {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        {/* <Header userName={savedUsername} /> */}
         <Header />
       </View>
 
@@ -251,10 +250,20 @@ const FinanceRow = ({ label, description }: RowProps) => (
 );
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
+  container: { 
+    flex: 1, 
+    backgroundColor: "#fff" 
+  },
   header: {},
-  scrollContent: { flex: 1, paddingHorizontal: 16 },
-  pageTitle: { fontSize: 18, fontWeight: "bold", marginVertical: 12 },
+  scrollContent: { 
+    flex: 1, 
+    paddingHorizontal: 16 
+  },
+  pageTitle: { 
+    fontSize: 18, 
+    fontWeight: "bold", 
+    marginVertical: 12 
+  },
   titleRow: {
     position: 'relative',
     flexDirection: 'row',
@@ -271,7 +280,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#e5e7eb",
   },
-  cardTitle: { fontSize: 16, fontWeight: "600", marginBottom: 12 },
+  cardTitle: { 
+    fontSize: 16, 
+    fontWeight: "600", 
+    marginBottom: 12 
+  },
   row: {
     flexDirection: "row",
     alignItems: "center",
@@ -279,10 +292,16 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#f0f0f0",
   },
-  rowLabel: { fontSize: 14, fontWeight: "500", color: "#111" },
-  rowDescription: { fontSize: 12, color: "#6b7280" },
+  rowLabel: { 
+    fontSize: 14, 
+    fontWeight: "500", 
+    color: "#111" 
+  },
+  rowDescription: { 
+    fontSize: 12, 
+    color: "#6b7280" 
+  },
   footer: {},
-  // Modal
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.4)",

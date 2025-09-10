@@ -284,7 +284,6 @@ export default function HistoryScreen() {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        {/* <Header userName="Guest" /> */}
         <Header />
       </View>
 
