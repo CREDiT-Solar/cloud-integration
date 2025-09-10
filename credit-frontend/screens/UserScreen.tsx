@@ -18,7 +18,8 @@ export default function UserScreen() {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Header userName="User" />
+        {/* <Header userName="User" /> */}
+        <Header />
       </View>
 
       {/* Main ScrollView */}

@@ -92,7 +92,8 @@ const handleCancel = () => {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Header userName={savedUsername} />
+        {/* <Header userName={savedUsername} /> */}
+        <Header />
       </View>
 
       {/* Main ScrollView */}

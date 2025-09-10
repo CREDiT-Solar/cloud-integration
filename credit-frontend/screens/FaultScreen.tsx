@@ -90,7 +90,8 @@ export default function FaultScreen() {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Header userName="Technician" />
+        {/* <Header userName="Technician" /> */}
+        <Header />
       </View>
 
       {/* Main */}

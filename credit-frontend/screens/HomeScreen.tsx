@@ -129,7 +129,8 @@ export default function HomeScreen() {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Header userName="Guest" />
+        {/* <Header userName="Guest" /> */}
+        <Header />
       </View>
 
       {/* Main ScrollView */}

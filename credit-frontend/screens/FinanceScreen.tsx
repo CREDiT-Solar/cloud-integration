@@ -17,7 +17,8 @@ export default function FinanceScreen() {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Header userName="Finance Manager" />
+        {/* <Header userName="Finance Manager" /> */}
+        <Header />
       </View>
 
       {/* Main ScrollView */}

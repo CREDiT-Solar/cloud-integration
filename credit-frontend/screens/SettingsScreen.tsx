@@ -33,7 +33,8 @@ export default function SettingsScreen() {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Header userName="Guest" />
+        {/* <Header userName="Guest" /> */}
+        <Header />
       </View>
 
       {/* Main ScrollView */}

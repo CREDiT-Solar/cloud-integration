@@ -196,7 +196,8 @@ export default function ControlScreen() {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Header userName="Site Manager" />
+        {/* <Header userName="Site Manager" /> */}
+        <Header />
       </View>
 
       {/* Main ScrollView */}
