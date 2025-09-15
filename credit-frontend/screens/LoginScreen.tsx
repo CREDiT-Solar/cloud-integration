@@ -1,30 +1,28 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Switch } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { RootStackParamList } from '../App'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import DropdownMenu from '../components/DropdownMenu';
+import {View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Switch } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import DropdownMenu from "../components/DropdownMenu";
 import { Picker } from "@react-native-picker/picker";
-
-type LoginScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'Login'
->;
+import { useAuth } from "../components/AuthContext";
 
 export default function LoginScreen() {
-  const navigation = useNavigation<LoginScreenNavigationProp>();
+  const navigation = useNavigation();
   const navigateTo = (screen: string) => {
     navigation.navigate(screen as never);
   };
 
+  const { login } = useAuth();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
-  const [selectedUserId, setSelectedUserId] = useState("User");
+  const [selectedUserType, setSelectedUserType] = useState("User");
 
   const handleLogin = () => {
-    console.log({ email, password, rememberMe, selectedUserId });
-    navigation.navigate('Home');
+    console.log({ email, password, rememberMe, selectedUserType });
+
+    login(email || "Guest", selectedUserType as any);
+
   };
 
   return (
@@ -32,8 +30,8 @@ export default function LoginScreen() {
       <View style={styles.card}>
         <View style={styles.header}>
           <View style={{ width: 28 }} />
-        <DropdownMenu triggerType="icon" navigateTo={navigateTo} />
-        </View>   
+          <DropdownMenu triggerType="icon" navigateTo={navigateTo} />
+        </View>
 
         {/* Title */}
         <Text style={styles.title}>CREDiT Digi Solution</Text>
@@ -69,8 +67,8 @@ export default function LoginScreen() {
         <Text style={styles.label}>Select User Type</Text>
         <View style={styles.pickerBox}>
           <Picker
-            selectedValue={selectedUserId}
-            onValueChange={(itemValue) => setSelectedUserId(itemValue)}
+            selectedValue={selectedUserType}
+            onValueChange={(itemValue) => setSelectedUserType(itemValue)}
             style={{ height: 44 }}
           >
             <Picker.Item label="User" value="User" />
@@ -101,7 +99,6 @@ export default function LoginScreen() {
           </Text>
         </Text>
 
-        {/* Footer */}
         <Text style={styles.footerText}>
           Enter your email address and password to continue
         </Text>
@@ -114,97 +111,96 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     justifyContent: "center",
-    backgroundColor: "#f0f6ff",
     padding: 16,
+    backgroundColor: "#f3f4f6",
   },
   card: {
     backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 24,
     width: "70%",
     alignSelf: "center",
+    borderRadius: 12,
+    padding: 20,
     shadowColor: "#000",
     shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 5,
+    shadowRadius: 6,
+    elevation: 3,
   },
-  header: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    marginBottom: 8,
+  header: { 
+    flexDirection: "row", 
+    justifyContent: "space-between" 
   },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 4,
+  title: { 
+    fontSize: 20, 
+    fontWeight: "bold", 
+    textAlign: "center", 
+    marginTop: 10 
   },
-  subtitle: {
-    fontSize: 14,
-    textAlign: "center",
-    color: "#6b7280",
-    marginBottom: 20,
+  subtitle: { 
+    fontSize: 14, 
+    color: "#555", 
+    textAlign: "center", 
+    marginBottom: 20 
   },
-  label: {
-    fontSize: 14,
-    fontWeight: "600",
-    marginBottom: 4,
+  label: { 
+    marginTop: 12, 
+    fontSize: 14, 
+    fontWeight: "500", 
+    color: "#111" 
   },
   input: {
     borderWidth: 1,
-    borderColor: "#e5e7eb",
-    borderRadius: 6,
+    borderColor: "#ddd",
+    borderRadius: 8,
     padding: 10,
-    marginBottom: 12,
+    marginTop: 4,
   },
-  rememberRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 12,
+  rememberRow: { 
+    flexDirection: "row", 
+    alignItems: "center", 
+    marginTop: 12 
   },
-  rememberText: {
-    marginLeft: 8,
-    fontSize: 14,
-    color: "#111",
+  rememberText: { 
+    marginLeft: 8, 
+    fontSize: 14, 
+    color: "#555" 
   },
   pickerBox: {
     borderWidth: 1,
-    borderColor: "#e5e7eb",
-    borderRadius: 6,
-    marginBottom: 16,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    marginTop: 4,
   },
   button: {
     backgroundColor: "#16a34a",
-    borderRadius: 6,
-    paddingVertical: 12,
-    marginTop: 4,
+    padding: 14,
+    borderRadius: 8,
+    alignItems: "center",
+    marginTop: 20,
   },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "600",
-    textAlign: "center",
-    fontSize: 15,
+  buttonText: { 
+    color: "#fff", 
+    fontSize: 16, 
+    fontWeight: "bold" 
   },
-  link: {
-    color: "#16a34a",
-    fontSize: 14,
-    textAlign: "center",
-    marginTop: 12,
+  link: { 
+    marginTop: 14, 
+    fontSize: 14, 
+    color: "#16a34a", 
+    textAlign: "center" 
   },
-  signUpText: {
-    textAlign: "center",
-    marginTop: 8,
-    fontSize: 13,
-    color: "#374151",
+  signUpText: { 
+    marginTop: 10, 
+    textAlign: "center", 
+    fontSize: 14 
   },
-  signUpLink: {
-    color: "#16a34a",
-    fontWeight: "600",
+  signUpLink: { 
+    color: "#16a34a", 
+    fontWeight: "bold" 
   },
-  footerText: {
-    fontSize: 12,
-    textAlign: "center",
-    color: "#6b7280",
-    marginTop: 12,
+  footerText: { 
+    marginTop: 20, 
+    fontSize: 12, 
+    textAlign: "center", 
+    color: "#666" 
   },
 });

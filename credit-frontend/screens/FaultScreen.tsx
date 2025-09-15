@@ -90,7 +90,7 @@ export default function FaultScreen() {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Header userName="Technician" />
+        <Header />
       </View>
 
       {/* Main */}
@@ -261,10 +261,20 @@ const FaultRow = ({ label, description, status, onPress }: RowProps) => (
 );
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
+  container: { 
+    flex: 1, 
+    backgroundColor: "#fff" 
+  },
   header: {},
-  scrollContent: { flex: 1, paddingHorizontal: 16 },
-  pageTitle: { fontSize: 18, fontWeight: "bold", marginVertical: 12 },
+  scrollContent: { 
+    flex: 1, 
+    paddingHorizontal: 16 
+  },
+  pageTitle: { 
+    fontSize: 18, 
+    fontWeight: "bold", 
+    marginVertical: 12 
+  },
   titleRow: {
     position: 'relative',
     flexDirection: 'row',
@@ -281,7 +291,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#e5e7eb",
   },
-  cardTitle: { fontSize: 16, fontWeight: "600", marginBottom: 12 },
+  cardTitle: { 
+    fontSize: 16, 
+    fontWeight: "600", 
+    marginBottom: 12 
+  },
   row: {
     flexDirection: "row",
     alignItems: "center",
@@ -289,11 +303,26 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#f0f0f0",
   },
-  rowLabel: { fontSize: 14, fontWeight: "500", color: "#111" },
-  rowDescription: { fontSize: 12, color: "#6b7280" },
+  rowLabel: { 
+    fontSize: 14, 
+    fontWeight: "500", 
+    color: "#111" 
+  },
+  rowDescription: { 
+    fontSize: 12, 
+    color: "#6b7280" 
+  },
   footer: {},
-  statusOk: { fontSize: 14, fontWeight: "600", color: "#22c55e" },
-  statusFault: { fontSize: 14, fontWeight: "600", color: "#dc2626" },
+  statusOk: { 
+    fontSize: 14, 
+    fontWeight: "600", 
+    color: "#22c55e" 
+  },
+  statusFault: { 
+    fontSize: 14, 
+    fontWeight: "600", 
+    color: "#dc2626" 
+  },
   modalOverlay: {
     flex: 1,
     justifyContent: "center",
@@ -307,7 +336,11 @@ const styles = StyleSheet.create({
     width: "85%",
     alignItems: "center",
   },
-  modalTitle: { fontSize: 16, fontWeight: "600", marginBottom: 10 },
+  modalTitle: { 
+    fontSize: 16, 
+    fontWeight: "600", 
+    marginBottom: 10 
+  },
   modalButtonRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -322,7 +355,15 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: "center",
   },
-  modalButtonText: { color: "#fff", fontWeight: "700" },
-  cancelButton: { backgroundColor: "#e5e7eb" },
-  cancelButtonText: { color: "#111", fontWeight: "700" },
+  modalButtonText: { 
+    color: "#fff", 
+    fontWeight: "700" 
+  },
+  cancelButton: { 
+    backgroundColor: "#e5e7eb" 
+  },
+  cancelButtonText: { 
+    color: "#111", 
+    fontWeight: "700" 
+  },
 });
