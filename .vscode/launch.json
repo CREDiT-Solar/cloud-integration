@@ -1,0 +1,74 @@
+{
+    "configurations": [
+        {
+            "type": "aws-sam",
+            "request": "direct-invoke",
+            "name": "solar-cloud:HelloWorldFunction (python3.13)",
+            "invokeTarget": {
+                "target": "template",
+                "templatePath": "${workspaceFolder}/aws-backend/churchlane/solar-cloud/template.yaml",
+                "logicalId": "HelloWorldFunction"
+            },
+            "lambda": {
+                "payload": {},
+                "environmentVariables": {},
+                "runtime": "python3.13"
+            }
+        },
+        {
+            "type": "aws-sam",
+            "request": "direct-invoke",
+            "name": "API solar-cloud:HelloWorldFunction (python3.13)",
+            "invokeTarget": {
+                "target": "api",
+                "templatePath": "${workspaceFolder}/aws-backend/churchlane/solar-cloud/template.yaml",
+                "logicalId": "HelloWorldFunction"
+            },
+            "api": {
+                "path": "/hello",
+                "httpMethod": "get",
+                "payload": {
+                    "json": {}
+                }
+            },
+            "lambda": {
+                "runtime": "python3.13"
+            }
+        },
+        {
+            "type": "aws-sam",
+            "request": "direct-invoke",
+            "name": "AWS-Hello-World:HelloWorldFunction (python3.13)",
+            "invokeTarget": {
+                "target": "template",
+                "templatePath": "${workspaceFolder}/aws-hello-world/AWS-Hello-World/template.yaml",
+                "logicalId": "HelloWorldFunction"
+            },
+            "lambda": {
+                "payload": {},
+                "environmentVariables": {},
+                "runtime": "python3.13"
+            }
+        },
+        {
+            "type": "aws-sam",
+            "request": "direct-invoke",
+            "name": "API AWS-Hello-World:HelloWorldFunction (python3.13)",
+            "invokeTarget": {
+                "target": "api",
+                "templatePath": "${workspaceFolder}/aws-hello-world/AWS-Hello-World/template.yaml",
+                "logicalId": "HelloWorldFunction"
+            },
+            "api": {
+                "path": "/hello",
+                "httpMethod": "get",
+                "payload": {
+                    "json": {}
+                }
+            },
+            "lambda": {
+                "runtime": "python3.13"
+            }
+        }
+    ]
+}
