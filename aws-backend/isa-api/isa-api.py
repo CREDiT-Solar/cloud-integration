@@ -9,10 +9,10 @@ import pymysql
 from queue import Queue
 
 SSH_CONFIG = {
-    "ssh_host": "isapc7.york.ac.uk",
+    "ssh_host": "isabs001.york.ac.uk",
     "ssh_port": 22,
-    "ssh_user": "davebradley",
-    "ssh_password": "ISAPC72024",
+    "ssh_user": "pg850",
+    "ssh_password": "solar_db123!",
     "remote_bind_host": "172.17.0.2",
     "remote_bind_port": 3306,
 }
